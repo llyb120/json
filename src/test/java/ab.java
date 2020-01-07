@@ -6,11 +6,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.llyb120.json.Json.a;
-import static com.github.llyb120.json.Json.o;
+import static com.github.llyb120.json.Json.*;
 
 public class ab {
 
@@ -69,6 +69,32 @@ public class ab {
         b ins = Json.cast(oo, b.class);
         c cc = Json.cast(ins, c.class);
         int d = 2;
+
+        Map map = new HashMap();
+        Obj obj = ro(map);
+        Obj cp = ooo(map);
+        map.put("a", 1);
+        obj.put("b", 2);
+        cp.put("c", 3);
+        cp.ss("fuck2");
+        obj.ss("fuck");
+        System.out.println("map is " + Json.stringify(map));
+        System.out.println("obj is " + Json.stringify(obj));
+        System.out.println("cp is " + Json.stringify(cp));
+
+        obj = o(
+                "a", a(
+                        o(
+                                "b", 1
+                        )
+                )
+        );
+        obj.s("a.0.b");
+
+        Arr arr = Json.parse("[1.0,2,3]");
+        arr.add(1L);
+        System.out.println(arr.toString());
+        int e = 2;
     }
 
     public Class getClz() throws Exception{

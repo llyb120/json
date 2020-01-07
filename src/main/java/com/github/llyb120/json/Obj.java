@@ -140,15 +140,11 @@ public class Obj implements Map<String,Object> {
     }
 
 
-    public <T> T get(Object key, Class<T> clz){
-        if(key instanceof String){
-            return cast(get((String)key), clz);
-        } else {
-            return cast(get((int)key), clz);
-        }
+    public <T> T get(String key, Class<T> clz){
+        return cast(get(key), clz);
     }
 
-    public String s(Object key){
+    public String s(String key){
         return get(key, String.class);
     }
 
@@ -160,7 +156,7 @@ public class Obj implements Map<String,Object> {
 //        }
 //    }
 
-    public String s(Object key, String defaultValue){
+    public String s(String key, String defaultValue){
         String str = s(key);
         if(Util.isEmpty(str)){
             return defaultValue;
@@ -183,7 +179,7 @@ public class Obj implements Map<String,Object> {
         return val;
     }
 
-    public Integer i(Object k, int defaultValue){
+    public Integer i(String k, int defaultValue){
         try{
             Integer val = i(k);
             if (val == null) {
@@ -195,16 +191,19 @@ public class Obj implements Map<String,Object> {
         }
     }
 
-    public Integer i(Object k){
+    public Integer i(String k){
         return get(k, Integer.class);
     }
 
     public int ii(String k){
+        int ret = 0;
         try{
-            return get(k, Integer.class);
+            ret = get(k, Integer.class);
         } catch (Exception e){
-            put(k, 0);
-            return 0;
+            ret = 0;
+        } finally {
+            put(k, ret);
+            return ret;
         }
     }
 
@@ -295,16 +294,14 @@ public class Obj implements Map<String,Object> {
 
 
 
-    public <T> T toBson() {
-        return castBson(this);
-    }
-
-    public static Obj fromBson(Object object) {
-        return (Obj) Json.fromBson(object);
-    }
-
-
-
+//    public <T> T toBson() {
+//        return castBson(this);
+//    }
+//
+//    public static Obj fromBson(Object object) {
+//        return (Obj) Json.fromBson(object);
+//    }
+//
     //    public Document toBsonDoc(){
 //        Document docuemnt = new Document();
 //        for (Entry<String, Object> entry : entrySet()) {

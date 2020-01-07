@@ -60,9 +60,13 @@ public class JsonEncoder {
             sb.append("\"");
 
         } else if (obj instanceof Long) {
-            sb.append("\"");
-            sb.append(obj);
-            sb.append("\"");
+            if((long)obj > Integer.MAX_VALUE){
+                sb.append("\"");
+                sb.append(obj);
+                sb.append("\"");
+            } else {
+                sb.append(obj);
+            }
         } else if (obj instanceof Date) {
             sb.append("\"");
             sb.append(sdf.format(obj));
