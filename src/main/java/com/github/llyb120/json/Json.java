@@ -1,6 +1,8 @@
 package com.github.llyb120.json;
 
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import sun.misc.Unsafe;
 
 import java.io.Serializable;
@@ -393,6 +395,14 @@ public abstract class Json<T> implements Serializable {
             json.put((String) objects[i], value);
         }
         return json;
+    }
+
+    public static Document bo(Object ...objects){
+        return castBson(o(objects));
+    }
+
+    public static List<? extends Bson> ba(Object ...objects){
+        return castBson(a(objects));
     }
 
 
