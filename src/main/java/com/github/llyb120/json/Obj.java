@@ -8,21 +8,21 @@ import java.util.*;
 import static com.github.llyb120.json.Json.cast;
 import static com.github.llyb120.json.Json.castBson;
 
-public class Obj implements Map<String,Object> {
+public class Obj implements Map<String, Object> {
 
-//    private boolean parallel = false;
+    //    private boolean parallel = false;
 //    private ThreadLocal<Map<String,Object>> local;
-    private Map<String,Object> map;
+    private Map<String, Object> map;
 
 //    public static interface KVIterator<U>{
 //        void call(String k, U v) throws Exception;
 //    }
 
-    public Obj(){
+    public Obj() {
         map = new LinkedHashMap<>();
     }
 
-    public Obj(Map map){
+    public Obj(Map map) {
         this();
         putAll(map);
     }
@@ -41,11 +41,11 @@ public class Obj implements Map<String,Object> {
 //        }
 //    }
 
-    public Map<String,Object> map(){
+    public Map<String, Object> map() {
         return map;
     }
 
-    public Obj map(Map map){
+    public Obj map(Map map) {
         this.map = map;
         return this;
     }
@@ -111,20 +111,20 @@ public class Obj implements Map<String,Object> {
     }
 
 
-    public Obj flex(Object ...objects){
+    public Obj flex(Object... objects) {
         Obj nobj = Json.o();
         boolean flexed = false;
         for (int i = 0; i < objects.length; i++) {
             Object obj = objects[i];
             boolean readNext = false;
-            if(obj instanceof FlexAction){
+            if (obj instanceof FlexAction) {
                 for (Entry<String, Object> entry : this.entrySet()) {
-                    if(((FlexAction) obj).canFlex(entry.getKey(), entry.getValue())){
+                    if (((FlexAction) obj).canFlex(entry.getKey(), entry.getValue())) {
                         Object fval = ((FlexAction) obj).call(entry.getKey(), entry.getValue());
-                        if(fval instanceof Map.Entry){
-                            nobj.put((String) ((Entry) fval).getKey(),  ((Entry) fval).getValue());
+                        if (fval instanceof Map.Entry) {
+                            nobj.put((String) ((Entry) fval).getKey(), ((Entry) fval).getValue());
                         } else {
-                            nobj.put(entry.getKey(), fval) ;
+                            nobj.put(entry.getKey(), fval);
                         }
                     }
                 }
@@ -132,7 +132,7 @@ public class Obj implements Map<String,Object> {
                 continue;
             }
         }
-        if(flexed){
+        if (flexed) {
             clear();
             map(nobj);
         }
@@ -140,11 +140,33 @@ public class Obj implements Map<String,Object> {
     }
 
 
-    public <T> T get(String key, Class<T> clz){
-        return cast(get(key), clz);
+    private  <T> T get(String key, Class<T> clz, boolean multi) {
+        if(multi){
+                String[] arr = key.split("\\.");
+                Obj item = this;
+                for (int i = 0; i < arr.length; i++) {
+                    if (i == arr.length - 1) {
+                        return item.get((arr[i]), clz, false);
+                    }
+                    item = item.get(arr[i], Obj.class, false);
+                    if (item == null) {
+                        item = Json.o();
+                    }
+                }
+                return null;
+            } else {
+                return cast(get(key), clz);
+            }
     }
 
-    public String s(String key){
+    public <T> T get(String key, Class<T> clz) {
+        if(containsKey(key)){
+            return get(key, clz, false);
+        }
+        return get(key, clz, key.contains("."));
+    }
+
+    public String s(String key) {
         return get(key, String.class);
     }
 
@@ -156,50 +178,50 @@ public class Obj implements Map<String,Object> {
 //        }
 //    }
 
-    public String s(String key, String defaultValue){
+    public String s(String key, String defaultValue) {
         String str = s(key);
-        if(Util.isEmpty(str)){
+        if (Util.isEmpty(str)) {
             return defaultValue;
         }
         return str;
     }
 
-    public String ss(String key){
+    public String ss(String key) {
         String val = s(key);
-        if(val == null){
+        if (val == null) {
             val = "";
         }
         put(key, val);
         return val;
     }
 
-    public String ss(String key, String defaultValue){
+    public String ss(String key, String defaultValue) {
         String val = s(key, defaultValue);
         put(key, val);
         return val;
     }
 
-    public Integer i(String k, int defaultValue){
-        try{
+    public Integer i(String k, int defaultValue) {
+        try {
             Integer val = i(k);
             if (val == null) {
                 val = defaultValue;
             }
             return val;
-        } catch (Exception e){
+        } catch (Exception e) {
             return defaultValue;
         }
     }
 
-    public Integer i(String k){
+    public Integer i(String k) {
         return get(k, Integer.class);
     }
 
-    public int ii(String k){
+    public int ii(String k) {
         int ret = 0;
-        try{
+        try {
             ret = get(k, Integer.class);
-        } catch (Exception e){
+        } catch (Exception e) {
             ret = 0;
         } finally {
             put(k, ret);
@@ -207,7 +229,7 @@ public class Obj implements Map<String,Object> {
         }
     }
 
-    public boolean b(Object k){
+    public boolean b(Object k) {
         Object val = get(k);
         if (val == null) {
             return false;
@@ -215,7 +237,7 @@ public class Obj implements Map<String,Object> {
         return cast(val, Boolean.class);
     }
 
-    public Long l(Object k){
+    public Long l(Object k) {
         Object val = get(k);
         if (val == null) {
             return null;
@@ -223,7 +245,7 @@ public class Obj implements Map<String,Object> {
         return cast(val, Long.class);
     }
 
-    public Long l(Object k, long defaultValue){
+    public Long l(Object k, long defaultValue) {
         Long val = l(k);
         if (val == null) {
             return defaultValue;
@@ -231,19 +253,19 @@ public class Obj implements Map<String,Object> {
         return val;
     }
 
-    public Date date(String key, String format){
+    public Date date(String key, String format) {
         try {
             return new SimpleDateFormat(format).parse(s(key));
-        } catch (Exception e){
+        } catch (Exception e) {
         }
         return null;
     }
 
-    public Obj o(String key){
-        return cast(get(key), Obj.class);
+    public Obj o(String key) {
+        return get(key, Obj.class);
     }
 
-    public Obj oo(String key){
+    public Obj oo(String key) {
         Obj ret = o(key);
         if (ret == null) {
             ret = Json.o();
@@ -252,11 +274,11 @@ public class Obj implements Map<String,Object> {
         return ret;
     }
 
-    public Arr a(String key){
-        return cast(get(key), Arr.class);
+    public Arr a(String key) {
+        return get(key, Arr.class);
     }
 
-    public Arr aa(String key){
+    public Arr aa(String key) {
         Arr ret = a(key);
         if (ret == null) {
             ret = Json.a();
@@ -265,9 +287,9 @@ public class Obj implements Map<String,Object> {
         return ret;
     }
 
-    public Obj v(String key, Validate validate, String msg, Object ...args){
+    public Obj v(String key, Validate validate, String msg, Object... args) {
         Object obj = get(key);
-        switch (validate){
+        switch (validate) {
             case NotNull:
                 if (obj == null) {
                     Validate.error(msg, args);
@@ -276,14 +298,14 @@ public class Obj implements Map<String,Object> {
 
             case NotEmpty:
                 obj = s(key, "");
-                if(Util.isEmptyIfStr(obj)){
+                if (Util.isEmptyIfStr(obj)) {
                     Validate.error(msg, args);
                 }
                 break;
 
             case NotBlank:
                 obj = s(key, "");
-                if(Util.isBlankIfStr(obj)){
+                if (Util.isBlankIfStr(obj)) {
                     Validate.error(msg, args);
                 }
                 break;
@@ -291,7 +313,6 @@ public class Obj implements Map<String,Object> {
 
         return this;
     }
-
 
 
 //    public <T> T toBson() {

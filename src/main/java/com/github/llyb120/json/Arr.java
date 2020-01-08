@@ -144,14 +144,6 @@ public class Arr implements List<Object> {
         return cast(list.get(index), Obj.class);
     }
 
-    public <T> T toBson() {
-        return castBson(this);
-    }
-
-    public static Arr fromBson(Object object) {
-        return (Arr) Json.fromBson(object);
-    }
-
     public String join(){
         return join(",");
     }
@@ -204,6 +196,19 @@ public class Arr implements List<Object> {
             arr.add(ooo(o));
         }
         return (List)arr;
+    }
+
+//    public String s(String i){
+//    }
+    public String s(int i){
+        if(i >= size()){
+            return null;
+        }
+        Object item = get(i);
+        if (item == null) {
+            return null;
+        }
+        return item.toString();
     }
 
 //    public Arr add(Object ...objects){

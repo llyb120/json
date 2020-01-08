@@ -1,11 +1,8 @@
 
 import com.github.llyb120.json.*;
-import org.junit.Test;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +50,6 @@ public class ab {
         public Map<String, Long> ffd;
     }
 
-    @Test
     public void test() throws Exception {
 //        Class clz1 = getClz();
 //        clz1.newInstance();
@@ -94,7 +90,31 @@ public class ab {
         Arr arr = Json.parse("[1.0,2,3]");
         arr.add(1L);
         System.out.println(arr.toString());
+
+        b ins2 = copy(ins);
         int e = 2;
+
+
+        Arr list = a(
+                o("a", 1),
+                o("a", 2),
+                o("a", 3),
+                o("a", 4)
+                );
+        for (Object o : list) {
+            
+        }
+        List<Obj> list2 = la(
+                o("a", 1),
+                o("a", 2),
+                o("a", 3),
+                o("a", 4)
+        );
+        for (Obj obj1 : list2) {
+
+        }
+
+//        List<Object> sd = la(1, null, "f", new Date(), new Object());
     }
 
     public Class getClz() throws Exception{

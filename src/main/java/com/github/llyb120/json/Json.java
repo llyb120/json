@@ -14,7 +14,7 @@ import java.util.*;
 import static com.github.llyb120.json.ReflectUtil.*;
 
 
-public abstract class Json<T> implements Serializable {
+public abstract class Json {
     public static Undefined undefined = new Undefined();
 
 
@@ -44,11 +44,12 @@ public abstract class Json<T> implements Serializable {
             }
             //如果key为null或undefined 则视为无效
             if(objects[i] == undefined || objects[i] == null){
+                i--;
                 continue;
             }
             Object value = objects[i + 1];
             //如果value为undefined，则无效
-            if(value == undefined){
+            if(value == undefined || value == null){
                 continue;
             }
             json.put((String) objects[i], value);
@@ -77,6 +78,7 @@ public abstract class Json<T> implements Serializable {
             }
             //如果key为null或undefined 则视为无效
             if(objects[i] == undefined || objects[i] == null){
+                i--;
                 continue;
             }
             Object value = objects[i + 1];
@@ -92,10 +94,17 @@ public abstract class Json<T> implements Serializable {
     public static Document bo(Object ...objects){
         return castBson(o(objects));
     }
+    public static Document booo(Object ...objects){
+        return castBson(ooo(objects));
+    }
 
-    public static List<? extends Bson> ba(Object ...objects){
+    public static List<? extends Document> ba(Object ...objects){
         return castBson(a(objects));
     }
+    public static List<? extends Document> baaa(Object ...objects){
+        return castBson(aaa(objects));
+    }
+
 
 
     /**
@@ -148,7 +157,7 @@ public abstract class Json<T> implements Serializable {
         return json;
     }
 
-    public static <T> List<T> la(Object ...objects){
+    public static <T> List<T> la(T ...objects){
         return (List<T>) a(objects);
     }
 
@@ -248,9 +257,6 @@ public abstract class Json<T> implements Serializable {
         return parse(new String(bs));
     }
 
-    public static <T> Json<T> toJson(Object source) {
-        return cast(source, Json.class);
-    }
 
 //    public static Obj2 toObj(Object object){
 //       return cast(object, Obj2.class);
@@ -523,7 +529,12 @@ public abstract class Json<T> implements Serializable {
                     ParameterizedType p = (ParameterizedType) targetType;
                     types = p.getActualTypeArguments();
                 }
-                Map map = (Map) newInstance(clz);
+                Map map;
+                if(clz == Obj.class){
+                    map = new Obj();
+                } else {
+                    map = (Map) newInstance(clz);
+                }
                 if (source instanceof Map) {
                     if (null != types && types.length > 1) {
                         for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) source).entrySet()) {
@@ -533,6 +544,13 @@ public abstract class Json<T> implements Serializable {
                         ((Map) map).putAll((Map) source);
                     }
 
+                }  else if(source instanceof Collection){
+                    //原数据可以变成map，key为数字，element为值
+                    int i = 0;
+                    for (Object o : ((Collection) source)) {
+                        map.put(i + "", o);
+                        i++;
+                    }
                 } else {
                     map.putAll(beanToMap(source));
                 }
@@ -559,6 +577,13 @@ public abstract class Json<T> implements Serializable {
 //        }
 //    }
 
+    public static <T> T copy(T source){
+        if (source == null) {
+            return null;
+        }
+        return (T) beanToBean(source, newInstance(source.getClass()));
+    }
+
     private static Map beanToMap(Object source){
         Map ret = new HashMap();
         ClassInfo classInfo = getClassInfo(source.getClass());
@@ -582,19 +607,25 @@ public abstract class Json<T> implements Serializable {
         return ret;
     }
 
-    private static Object mapToBean(Map<Object, Object> source, Class clz) {
-        Object ins = newInstance(clz);
+    private static <T> Object mapToBean(Map<Object, Object> source, Class<T> clz) {
+        return mapToBean(source, clz, null);
+    }
+    private static <T> Object mapToBean(Map<Object, Object> source, Class<T> clz, T ins) {
+        if (ins == null) {
+            ins = newInstance(clz);
+        }
         ClassInfo info = getClassInfo(clz);
-        info.fields.forEach((k,v) -> {
+        T finalIns = ins;
+        info.fields.forEach((k, v) -> {
             Type type = v.field.getGenericType();
-            setValue(ins, v, cast(source.get(v.name), type));
+            setValue(finalIns, v, cast(source.get(v.name), type));
         });
         //setter
         info.setters.forEach((k,v) -> {
             Type type = v.getGenericParameterTypes()[0];
             Object value = cast(source.get(k), type);
             try{
-                v.invoke(ins, value);
+                v.invoke(finalIns, value);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -616,5 +647,9 @@ public abstract class Json<T> implements Serializable {
     private static Object beanToBean(Object source, Class clz) {
         Map map = beanToMap(source);
         return mapToBean(map, clz);
+    }
+    private static <T> T beanToBean(Object source, T ins) {
+        Map map = beanToMap(source);
+        return (T) mapToBean(map, (Class<T>)ins.getClass(), ins);
     }
 }
