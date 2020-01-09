@@ -104,15 +104,15 @@ public class ab {
         for (Object o : list) {
             
         }
-        List<Obj> list2 = la(
-                o("a", 1),
-                o("a", 2),
-                o("a", 3),
-                o("a", 4)
-        );
-        for (Obj obj1 : list2) {
-
-        }
+//        List<Obj> list2 = la(
+//                o("a", 1),
+//                o("a", 2),
+//                o("a", 3),
+//                o("a", 4)
+//        );
+//        for (Obj obj1 : list2) {
+//
+//        }
 
 //        List<Object> sd = la(1, null, "f", new Date(), new Object());
     }

@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import static com.github.llyb120.json.Json.*;
 
 
-public class Arr implements List<Object> {
+public class Arr<X> implements List<X> {
 
     private List list;
 
@@ -24,18 +24,18 @@ public class Arr implements List<Object> {
     }
 
     @Override
-    public Object set(int index, Object element) {
-        return list().set(index, element);
+    public X set(int index, X element) {
+        return (X) list().set(index, element);
     }
 
     @Override
-    public void add(int index, Object element) {
+    public void add(int index, X element) {
         list().add(index, element);
     }
 
     @Override
-    public Object remove(int index) {
-        return (Object) list().remove(index);
+    public X remove(int index) {
+        return (X) list().remove(index);
     }
 
     @Override
@@ -49,17 +49,17 @@ public class Arr implements List<Object> {
     }
 
     @Override
-    public ListIterator<Object> listIterator() {
+    public ListIterator<X> listIterator() {
         return list().listIterator();
     }
 
     @Override
-    public ListIterator<Object> listIterator(int index) {
+    public ListIterator<X> listIterator(int index) {
         return list().listIterator(index);
     }
 
     @Override
-    public List<Object> subList(int fromIndex, int toIndex) {
+    public List<X> subList(int fromIndex, int toIndex) {
         return list().subList(fromIndex, toIndex);
     }
 
@@ -79,13 +79,13 @@ public class Arr implements List<Object> {
     }
 
     @Override
-    public Iterator<Object> iterator() {
+    public Iterator<X> iterator() {
         return list().iterator();
     }
 
     @Override
-    public Object[] toArray() {
-        return list().toArray();
+    public X[] toArray() {
+        return (X[]) list().toArray();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class Arr implements List<Object> {
     }
 
     @Override
-    public boolean add(Object o) {
+    public boolean add(X o) {
         return list().add(o);
     }
 
@@ -110,12 +110,12 @@ public class Arr implements List<Object> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends Object> c) {
+    public boolean addAll(Collection<? extends X> c) {
         return list().addAll(c);
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends Object> c) {
+    public boolean addAll(int index, Collection<? extends X> c) {
         return list().addAll(c);
     }
 
@@ -136,8 +136,8 @@ public class Arr implements List<Object> {
     }
 
     @Override
-    public Object get(int index ) {
-        return (Object) list().get(index);
+    public X get(int index ) {
+        return (X) list().get(index);
     }
 
     public Obj o(int index){
@@ -172,7 +172,7 @@ public class Arr implements List<Object> {
 
     public Arr filter(ArrFilterFunc<Obj> function){
         Arr ret = a();
-        for (Object t : this) {
+        for (X t : this) {
             if(function.call(ooo(t))){
                 ret.add(t);
             }
@@ -182,7 +182,7 @@ public class Arr implements List<Object> {
 
     public <T> Arr filter(Class<T> clz, ArrFilterFunc<T> function){
         Arr ret = a();
-        for (Object t : this) {
+        for (X t : this) {
             if(function.call((T) t)){
                 ret.add(t);
             }
@@ -190,42 +190,44 @@ public class Arr implements List<Object> {
         return ret;
     }
 
-    public List<Obj> oa(){
-        Arr arr = a();
-        for (Object o : this) {
-            arr.add(ooo(o));
-        }
-        return (List)arr;
+    /**
+     *
+     * @return Arr<Obj>
+     */
+    @Deprecated
+    public Arr<Obj> oa(){
+        return aaa(this.stream()
+                .map(Json::ro)
+                .toArray());
     }
 
-//    public String s(String i){
-//    }
+
     public String s(int i){
         if(i >= size()){
             return null;
         }
-        Object item = get(i);
+        X item = get(i);
         if (item == null) {
             return null;
         }
         return item.toString();
     }
 
-//    public Arr add(Object ...objects){
-//        for (Object object : objects) {
+//    public Arr add(X ...objects){
+//        for (X object : objects) {
 //           add(object);
 //        }
 //        return this;
 //    }
 
-    public Arr addAll(Object ...objects){
+    public Arr addAll(X ...objects){
         addAll(Arrays.asList(objects));
         return this;
     }
 
     public <U> Obj group(ArrGroupFunc<U> function){
         Obj cache = Json.o();
-        for (Object t : this) {
+        for (X t : this) {
             try {
                 String key = (String) function.call((U)t);
                 Arr arr = cache.aa(key);
@@ -260,7 +262,7 @@ public class Arr implements List<Object> {
 
     //    public List<? extends Bson> toBsonArray(){
 //        List list = new ArrayList();
-//        for (Object o : this) {
+//        for (X o : this) {
 //            if(o instanceof Obj){
 //                list.add(((Obj) o).toBson());
 //            } else if(o instanceof Arr){

@@ -61,8 +61,12 @@ public abstract class Json {
      * 引用obj
      * @return
      */
-    public static Obj ro(Map map){
-        return new Obj().map(map);
+    public static Obj ro(Object map){
+        if(map instanceof Map){
+            return new Obj().map((Map) map);
+        } else {
+            return cast(map, Obj.class);
+        }
     }
 
     public static Obj ooo(Object ...objects){
@@ -116,7 +120,7 @@ public abstract class Json {
      * @param objects
      * @return
      */
-    public static Arr aaa(Object ...objects){
+    public static <T> Arr<T> aaa(Object ...objects){
         Arr arr = a();
         for (Object object : objects) {
             if (object == null || object == undefined) {
@@ -146,9 +150,9 @@ public abstract class Json {
        return new Arr().list(list);
     }
 
-    public static Arr a(Object ...objects){
+    public static <T> Arr<T> a(T ...objects){
         Arr json = new Arr();
-        for (Object object : objects) {
+        for (T object : objects) {
             if(object == undefined){
                 continue;
             }
@@ -157,13 +161,13 @@ public abstract class Json {
         return json;
     }
 
-    public static <T> List<T> la(T ...objects){
-        return (List<T>) a(objects);
-    }
-
-    public static <T> List<T> laaa(Object ...objects){
-        return (List<T>) aaa(objects);
-    }
+//    public static <T> List<T> la(T ...objects){
+//        return (List<T>) a(objects);
+//    }
+//
+//    public static <T> List<T> laaa(Object ...objects){
+//        return (List<T>) aaa(objects);
+//    }
 
 
     public static Arr tree(Collection<? extends Map> list, String parentKey, String childKey) {

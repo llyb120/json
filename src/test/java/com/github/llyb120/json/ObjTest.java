@@ -2,6 +2,9 @@ package com.github.llyb120.json;
 
 import org.testng.annotations.Test;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.github.llyb120.json.Json.*;
 import static org.testng.Assert.*;
 
@@ -48,9 +51,24 @@ public class ObjTest {
     }
 
 
+//    public Arr<Obj> ora(){
+//    }
+    
     public void tt() {
-        Arr arr  = a();
-
+//        Arr arr;
+//        for (int i = 0; i < arr.size(); i++) {
+//        }
+//        for (Obj obj : arr.oa()) {
+//
+//        }
+//        for (Object o : arr.oa()) {
+//
+//        }
+//
+//        for (Object o : arr.oa()) {
+//
+//        }
+        
 
         o(
                 "@for", a(1, 2, 3),

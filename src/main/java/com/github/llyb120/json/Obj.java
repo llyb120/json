@@ -274,11 +274,11 @@ public class Obj implements Map<String, Object> {
         return ret;
     }
 
-    public Arr a(String key) {
+    public Arr<? super Object> a(String key) {
         return get(key, Arr.class);
     }
 
-    public Arr aa(String key) {
+    public Arr<? super Object> aa(String key) {
         Arr ret = a(key);
         if (ret == null) {
             ret = Json.a();
