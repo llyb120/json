@@ -192,7 +192,6 @@ public class Arr<X> implements List<X> {
 
     /**
      *
-     * @return Arr<Obj>
      */
     @Deprecated
     public Arr<Obj> oa(){

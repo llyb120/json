@@ -62,10 +62,17 @@ public abstract class Json {
      * @return
      */
     public static Obj ro(Object map){
+        if (map == null) {
+            return o();
+        }
         if(map instanceof Map){
             return new Obj().map((Map) map);
         } else {
-            return cast(map, Obj.class);
+            Obj val = cast(map, Obj.class);
+            if (val == null) {
+                return null;
+            }
+            return val;
         }
     }
 
