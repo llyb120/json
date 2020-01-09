@@ -2,8 +2,7 @@ package com.github.llyb120.json;
 
 import org.testng.annotations.Test;
 
-import static com.github.llyb120.json.Json.a;
-import static com.github.llyb120.json.Json.o;
+import static com.github.llyb120.json.Json.*;
 import static org.testng.Assert.*;
 
 public class ObjTest {
@@ -15,11 +14,11 @@ public class ObjTest {
                         "b", 1
                 ),
                 "c", a(
-                     o(
-                             "d", 1
-                     )   ,
                         o(
-                                "d",2
+                                "d", 1
+                        ),
+                        o(
+                                "d", 2
                         )
                 )
         );
@@ -37,7 +36,7 @@ public class ObjTest {
         Obj obj = o(
                 "c", o(
                         "a", a(
-                                1,2,3
+                                1, 2, 3
                         )
                 )
         );
@@ -47,4 +46,17 @@ public class ObjTest {
         assertEquals(arr.get(1), 2);
         assertEquals(arr.get(2), 3);
     }
+
+
+    public void tt() {
+        Arr arr  = a();
+
+
+        o(
+                "@for", a(1, 2, 3),
+                "${item}", "@if item > 0", o("${item}", "fk"), "@else", 2, "@end",
+                "@end"
+        );
+    }
+
 }
