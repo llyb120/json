@@ -11,36 +11,6 @@ public class JsonParser {
     private int ptr = 0;
     private int len = 0;
     private StringBuilder sb = new StringBuilder();
-//        private StringBuilder sb = new StringBuilder();
-
-    enum JsonTokenType {
-        LEFT_LARGE_BLOCK,
-        RIGHT_LARGE_BLOCK,
-        LEFT_MIDDLE_BLOCK,
-        RIGHT_MIDDLE_BLOCK,
-        COMMA,
-        COLON,
-        STRING,
-        BOOL,
-        NUMBER,
-        TOKEN,
-        NULL;
-    }
-
-    private static class JsonToken {
-        public JsonTokenType type;
-        public String value;
-
-        public JsonToken(JsonTokenType type, String value) {
-            this.type = type;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return type.name() + " : " + value;
-        }
-    }
 
     public JsonParser(String str) {
         this.str = str;
