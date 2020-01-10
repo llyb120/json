@@ -3,8 +3,7 @@ package com.github.llyb120.json;
 
 import java.math.BigDecimal;
 
-import static com.github.llyb120.json.Json.a;
-import static com.github.llyb120.json.Json.o;
+import static com.github.llyb120.json.Json.*;
 
 
 public class JsonParser {
@@ -24,6 +23,7 @@ public class JsonParser {
         STRING,
         BOOL,
         NUMBER,
+        TOKEN,
         NULL;
     }
 
@@ -89,11 +89,12 @@ public class JsonParser {
                 case RIGHT_MIDDLE_BLOCK:
                     throw new RuntimeException();
 
+                case TOKEN:
                 case STRING:
                     if (key == null) {
                         key = token.value;
                     } else {
-                        obj.put(key, token.value);
+                        obj.put(key, parseValue(token));
                         key = null;
                     }
                     break;
@@ -111,7 +112,10 @@ public class JsonParser {
     }
 
     private Object parseValue(JsonToken token) {
-        if (token.type == JsonTokenType.NUMBER) {
+        if(token.type == JsonTokenType.TOKEN){
+            return new BigDecimal(token.value);
+        }
+        else if (token.type == JsonTokenType.NUMBER) {
             return new BigDecimal(token.value);
 //            if(token.value.contains(".")){
 //                return Double.parseDouble(token.value);
@@ -176,6 +180,20 @@ public class JsonParser {
         throw new RuntimeException();
     }
 
+    private boolean isLineComment(){
+        return str.charAt(ptr) == '/' && (ptr < len - 1) && str.charAt(ptr + 1) == '/';
+    }
+    private boolean isMultipleCommentStart(){
+        return str.charAt(ptr) == '/' && (ptr < len - 1) && str.charAt(ptr + 1) == '*';
+    }
+    private boolean isMultipleCommentEnd(){
+        //到达末尾，结束
+        if(ptr >= len){
+            return true;
+        }
+        return str.charAt(ptr) == '*' && (ptr < len - 1) && str.charAt(ptr + 1) == '/';
+    }
+
     private JsonToken readToken() {
         sb.setLength(0);
         boolean isBlank = false;
@@ -203,6 +221,36 @@ public class JsonParser {
 //                ptr += 2;
 //                continue;
 //            }
+            if(isLineComment()){
+                //读到末尾
+                ptr += 2;
+                while(ptr < len){
+                    ch = str.charAt(ptr);
+                    if(ch == '\n'){
+                        break;
+                    }
+                    ptr++;
+                }
+                ch = str.charAt(ptr);
+            }
+            if(isMultipleCommentStart()){
+                ptr += 2;
+                while(ptr < len){
+                    if(isMultipleCommentEnd()){
+                        break;
+                    }
+                    ptr++;
+                }
+                ptr += 2;
+                ch = str.charAt(ptr);
+            }
+
+            //如果已经结束了
+            if(ptr >= len){
+                break;
+            }
+
+            //
             isBlank = Util.isBlankChar(ch);
             if (start > -1) {
                 if (isStrStart && isStr) {
@@ -223,7 +271,7 @@ public class JsonParser {
 //                        if(isStr){
 //                            return new JsonToken(JsonTokenType.STRING, token);
 //                        }
-                    return new JsonToken(JsonTokenType.NUMBER, token);
+                    return new JsonToken(JsonTokenType.TOKEN, token);
                 } else {
                     //不是空格的情况下才往下走（空格立刻结束）
                     ptr++;

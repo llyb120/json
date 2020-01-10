@@ -46,14 +46,24 @@ public class ReflectUtil {
 
     public static Object getValue(Object ins, FieldInfo info){
         try{
-            return unsafe.getObject(ins, info.offset);
+            return info.field.get(ins);
+//            return unsafe.getObject(ins, info.offset);
         } catch (Exception e){
             return null;
         }
     }
 
     public static void setValue(Object ins, FieldInfo info, Object value){
-        unsafe.putObject(ins, info.offset, value);
+        try {
+            info.field.set(ins, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+//        if(value instanceof Integer){
+//            unsafe.putInt(ins, info.offset, (int) value);
+//        } else {
+//            unsafe.putObject(ins, info.offset, value);
+//        }
     }
 
 

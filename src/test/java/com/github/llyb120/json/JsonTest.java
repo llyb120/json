@@ -1,13 +1,22 @@
 package com.github.llyb120.json;
 
-import org.testng.annotations.Test;
+
+import org.junit.Test;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.github.llyb120.json.Json.o;
-import static org.testng.Assert.*;
+import static com.github.llyb120.json.Json.ro;
+import static org.junit.Assert.*;
 
 public class JsonTest {
 
-    @Test(priority = 0)
+    @Test
     public void testO() throws InterruptedException {
         Obj obj = o(
                 "a", 1,
@@ -15,7 +24,48 @@ public class JsonTest {
         );
     }
 
-    @Test(priority = 1)
+    @Test
     public void testCopy() {
+    }
+
+    @Test
+    public void parse() throws IOException {
+        RandomAccessFile raf = new RandomAccessFile("E:\\work\\json\\test\\1.json5", "r");
+        byte[] bs = new byte[(int) raf.length()];
+        raf.read(bs);
+        Obj item = Json.parse(bs);
+        System.out.println(item);
+    }
+
+    static class Ro{
+        public int a = 1;
+        public Map<String, Object> map;
+        private String b;
+
+        public void setB(String b) {
+            this.b = b;
+        }
+    }
+
+    @Test
+    public void testRo() {
+        Map map  = new HashMap<>();
+        Obj obj = ro(map);
+        map.put("a", 1);
+        assertEquals(obj.ii("a"), 1);
+        obj.put("b", 2);
+        assertEquals(map.get("b"), 2);
+
+
+//        Ro r = new Ro();
+//        Obj obj2 = ro(r);
+//
+//        obj2.put("a", 123);
+//        assertEquals(r.a, 123);
+//        obj2.put("b", "jian");
+//        assertEquals(r.b, "jian");
+//
+//        obj2.oo("map").put("ajian", "1");
+//        assertEquals(r.map.get("ajian"), "1");
     }
 }

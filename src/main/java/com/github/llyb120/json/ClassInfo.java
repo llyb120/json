@@ -12,4 +12,5 @@ public class ClassInfo {
     public Map<String, Method> getters = new ConcurrentHashMap<>();
     public Map<String, Method> setters = new ConcurrentHashMap<>();
     public Map<String,FieldInfo> fields = new ConcurrentHashMap<>();
+
 }

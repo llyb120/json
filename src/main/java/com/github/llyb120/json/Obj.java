@@ -1,6 +1,8 @@
 package com.github.llyb120.json;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -13,6 +15,8 @@ public class Obj implements Map<String, Object> {
     //    private boolean parallel = false;
 //    private ThreadLocal<Map<String,Object>> local;
     private Map<String, Object> map;
+//    private Object ref;
+//    private ClassInfo classInfo;
 
 //    public static interface KVIterator<U>{
 //        void call(String k, U v) throws Exception;
@@ -50,6 +54,15 @@ public class Obj implements Map<String, Object> {
         return this;
     }
 
+//    Obj ref(Object ref){
+//        if (ref == null) {
+//            return this;
+//        }
+//        this.ref = ref;
+//        this.classInfo = ReflectUtil.getClassInfo(ref.getClass());
+//        return this;
+//    }
+
     @Override
     public int size() {
         return map().size();
@@ -77,6 +90,39 @@ public class Obj implements Map<String, Object> {
 
     @Override
     public Object put(String key, Object value) {
+//        if (ref != null && classInfo != null) {
+//            FieldInfo field = classInfo.fields.get(key);
+//            if (field != null) {
+//                Object nv = cast(value, field.field.getGenericType());
+//                if(field.field.getType().isAssignableFrom(value.getClass())){
+//
+//                }
+//                else if(value instanceof Obj){
+//                    if(nv instanceof Map){
+//                        ((Obj) value).map((Map) nv);
+//                    } else {
+//                        ((Obj) value).ref(nv);
+//                    }
+//                }
+//                ReflectUtil.setValue(ref, field, nv);
+//            }
+//            Method setter = classInfo.setters.get(key);
+//            if (setter != null) {
+//                Object nv = cast(value, setter.getGenericParameterTypes()[0]);
+//                if(value instanceof Obj){
+//                    if(nv instanceof Map){
+//                        ((Obj) value).map((Map) nv);
+//                    } else {
+//                        ((Obj) value).ref(nv);
+//                    }
+//                }
+//                try {
+//                    setter.invoke(ref, nv);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
         return map().put(key, value);
     }
 
