@@ -34,22 +34,21 @@ public abstract class Json {
 //    public <T> T to(TypeReference<T> reference){
 //        return Json.cast(this, reference);
 //    }
-
     public static Obj o(Object... objects) {
         Obj json = new Obj();
         for (short i = 0; i < objects.length; i += 2) {
             //没这个元素了，则直接gg
-            if(i + 1 >= objects.length){
+            if (i + 1 >= objects.length) {
                 continue;
             }
             //如果key为null或undefined 则视为无效
-            if(objects[i] == undefined || objects[i] == null){
+            if (objects[i] == undefined || objects[i] == null) {
                 i--;
                 continue;
             }
             Object value = objects[i + 1];
             //如果value为undefined，则无效
-            if(value == undefined || value == null){
+            if (value == undefined || value == null) {
                 continue;
             }
             json.put((String) objects[i], value);
@@ -59,13 +58,14 @@ public abstract class Json {
 
     /**
      * 引用obj
+     *
      * @return
      */
-    public static Obj ro(Object map){
+    public static Obj ro(Object map) {
         if (map == null) {
             return o();
         }
-        if(map instanceof Map){
+        if (map instanceof Map) {
             return new Obj().map((Map) map);
         } else {
             Obj val = cast(map, Obj.class);
@@ -76,25 +76,25 @@ public abstract class Json {
         }
     }
 
-    public static Obj ooo(Object ...objects){
+    public static Obj ooo(Object... objects) {
         Obj json = new Obj();
         for (short i = 0; i < objects.length; i += 2) {
-            if(objects[i] instanceof Map){
-                json.putAll((Map)objects[i]);
+            if (objects[i] instanceof Map) {
+                json.putAll((Map) objects[i]);
                 continue;
             }
             //没这个元素了，则直接gg
-            if(i + 1 >= objects.length){
+            if (i + 1 >= objects.length) {
                 continue;
             }
             //如果key为null或undefined 则视为无效
-            if(objects[i] == undefined || objects[i] == null){
+            if (objects[i] == undefined || objects[i] == null) {
                 i--;
                 continue;
             }
             Object value = objects[i + 1];
             //如果value为undefined，则无效
-            if(value == undefined || value == null){
+            if (value == undefined || value == null) {
                 continue;
             }
             json.put((String) objects[i], value);
@@ -102,20 +102,21 @@ public abstract class Json {
         return json;
     }
 
-    public static Document bo(Object ...objects){
+    public static Document bo(Object... objects) {
         return castBson(o(objects));
     }
-    public static Document booo(Object ...objects){
+
+    public static Document booo(Object... objects) {
         return castBson(ooo(objects));
     }
 
-    public static List<? extends Document> ba(Object ...objects){
+    public static List<? extends Document> ba(Object... objects) {
         return castBson(a(objects));
     }
-    public static List<? extends Document> baaa(Object ...objects){
+
+    public static List<? extends Document> baaa(Object... objects) {
         return castBson(aaa(objects));
     }
-
 
 
     /**
@@ -124,23 +125,24 @@ public abstract class Json {
      * 2 如果是一个可以遍历的集合，则会被展开放入
      * 3 如果是一个数组，也会展开放入
      * 4 展开行为只存在于第一层
+     *
      * @param objects
      * @return
      */
-    public static <T> Arr<T> aaa(Object ...objects){
+    public static <T> Arr<T> aaa(Object... objects) {
         Arr arr = a();
         for (Object object : objects) {
             if (object == null || object == undefined) {
                 continue;
             }
-            if(object instanceof Collection){
+            if (object instanceof Collection) {
                 arr.addAll((Collection) object);
-            } else if(object.getClass().getSimpleName().contains("[]")){
+            } else if (object.getClass().getSimpleName().contains("[]")) {
                 //数组的情况
                 arr.addAll(Arrays.asList(objects));
-            }else if(object instanceof Iterable) {
+            } else if (object instanceof Iterable) {
                 ((Iterable) object).forEach(arr::add);
-            }else {
+            } else {
                 arr.add(object);
             }
         }
@@ -153,14 +155,14 @@ public abstract class Json {
      * @param list
      * @return
      */
-    public static Arr ra(List list){
-       return new Arr().list(list);
+    public static Arr ra(List list) {
+        return new Arr().list(list);
     }
 
-    public static <T> Arr<T> a(T ...objects){
+    public static <T> Arr<T> a(T... objects) {
         Arr json = new Arr();
         for (T object : objects) {
-            if(object == undefined){
+            if (object == undefined) {
                 continue;
             }
             json.add(object);
@@ -291,7 +293,6 @@ public abstract class Json {
 //    public Object toBson() {
 //        return castBson(this);
 //    }
-
     protected static Object fromBson(Object object) {
         if (object instanceof Collection) {
             Arr arr = a();
@@ -313,13 +314,13 @@ public abstract class Json {
         }
     }
 
-    protected static  <T> T castBson(Object object) {
+    protected static <T> T castBson(Object object) {
         if (object == null) return (T) object;
         if (object.getClass().getName().startsWith("org.bson")) {
             return (T) object;
         }
         if (object instanceof Map) {
-            Map document = newInstance("org.bson.Document");
+            Map document = new Document();//newInstance("org.bson.Document");
             for (Object o : ((Map) object).entrySet()) {
                 Map.Entry entry = (Map.Entry) o;
                 document.put((String) entry.getKey(), castBson(entry.getValue()));
@@ -331,9 +332,9 @@ public abstract class Json {
                 list.add(castBson(o));
             }
             return (T) list;
-        } else if(object.getClass().getSimpleName().contains("[]")){
+        } else if (object.getClass().getSimpleName().contains("[]")) {
             //byte对象不进行转换
-            if(object.getClass().getSimpleName().equals("byte[]")){
+            if (object.getClass().getSimpleName().equals("byte[]")) {
                 return (T) object;
             } else {
                 List list = new ArrayList();
@@ -348,21 +349,21 @@ public abstract class Json {
             return (T) object;
         } else {
             //尝试转换为Document
-            Map document = newInstance("org.bson.Document");
+            Map document = new Document();//newInstance("org.bson.Document");
             //字段
             ClassInfo info = ReflectUtil.getClassInfo(object.getClass());
-            info.fields.forEach((k,v) -> {
+            info.fields.forEach((k, v) -> {
                 Object value = castBson(getValue(object, v));//v.get(object));
                 document.put(k, value);
             });
             //getter
-            info.getters.forEach((k,v) -> {
+            info.getters.forEach((k, v) -> {
                 Object value = null;
                 try {
                     value = castBson(v.invoke(object));
                 } catch (IllegalAccessException | InvocationTargetException e) {
                 }
-                document.put(k, value) ;
+                document.put(k, value);
             });
 //            MethodAccess ma = MethodAccess.get(object.getClass());
 //            int i = 0;
@@ -380,7 +381,7 @@ public abstract class Json {
     }
 
 
-    public static <T> T cast(Object source, TypeReference<T> typeReference){
+    public static <T> T cast(Object source, TypeReference<T> typeReference) {
         return cast(source, typeReference.getType());
     }
 
@@ -389,9 +390,9 @@ public abstract class Json {
     }
 
     public static <T> T cast(Object source, Type targetType) {
-        try{
+        try {
             return _cast(source, targetType);
-        } catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
@@ -400,180 +401,182 @@ public abstract class Json {
         if (source == null) {
             return null;
         }
-            Class<?> type = source.getClass();
-            //基本类型
-            if (targetType == Object.class) {
+        Class<?> type = source.getClass();
+        //基本类型
+        if (targetType == Object.class) {
+            return (T) source;
+        }
+        if (targetType == String.class) {
+            if (source instanceof String) {
+                if (((String) source).equalsIgnoreCase("null")) {
+                    return null;
+                }
                 return (T) source;
+            } else {
+                return (T) String.valueOf(source);
             }
-            if (targetType == String.class) {
-                if (source instanceof String) {
-                    return (T) source;
-                } else {
-                    return (T) String.valueOf(source);
-                }
-            }
-            if (source instanceof String && (targetType == Arr.class || targetType == Obj.class)) {
-                return Json.parse((String) source);
-            }
-            if (targetType == Boolean.class || targetType == boolean.class) {
-                if (source instanceof Boolean) {
-                    return (T) source;
-                } else {
-                    //尝试本身转换
-                    try {
-                        String str = String.valueOf(source);
-                        if (str.equalsIgnoreCase("true")) {
-                            return (T) Boolean.TRUE;
-                        } else if (str.equalsIgnoreCase("false")) {
-                            return (T) Boolean.FALSE;
-                        } else {
-                            //尝试使用数字
-                            BigDecimal decimal = new BigDecimal(String.valueOf(source));
-                            return (T) (decimal.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE);
-                        }
-                    } catch (Exception e) {
+        }
+        if (source instanceof String && (targetType == Arr.class || targetType == Obj.class)) {
+            return Json.parse((String) source);
+        }
+        if (targetType == Boolean.class || targetType == boolean.class) {
+            if (source instanceof Boolean) {
+                return (T) source;
+            } else {
+                //尝试本身转换
+                try {
+                    String str = String.valueOf(source);
+                    if (str.equalsIgnoreCase("true")) {
+                        return (T) Boolean.TRUE;
+                    } else if (str.equalsIgnoreCase("false")) {
+                        return (T) Boolean.FALSE;
+                    } else {
+                        //尝试使用数字
+                        BigDecimal decimal = new BigDecimal(String.valueOf(source));
+                        return (T) (decimal.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE);
                     }
-                    //啥都没有，那就false吧
-                    return (T) Boolean.FALSE;
+                } catch (Exception e) {
+                }
+                //啥都没有，那就false吧
+                return (T) Boolean.FALSE;
+            }
+        }
+        if (targetType == Integer.class || targetType == int.class) {
+            if (source instanceof Integer) {
+                return (T) source;
+            } else {
+                try {
+                    return (T) (Integer) Integer.parseInt(String.valueOf(source));
+                } catch (Exception e) {
+                    return (T) (Integer) 0;
                 }
             }
-            if (targetType == Integer.class || targetType == int.class) {
-                if (source instanceof Integer) {
-                    return (T) source;
-                } else {
-                    try {
-                        return (T) (Integer) Integer.parseInt(String.valueOf(source));
-                    } catch (Exception e) {
-                        return (T) (Integer) 0;
-                    }
+        }
+        if (targetType == Long.class || targetType == long.class) {
+            if (source instanceof Long) {
+                return (T) source;
+            } else {
+                try {
+                    return (T) (Long) Long.parseLong(String.valueOf(source));
+                } catch (Exception e) {
+                    return (T) (Long) 0L;
                 }
             }
-            if (targetType == Long.class || targetType == long.class) {
-                if (source instanceof Long) {
-                    return (T) source;
-                } else {
-                    try {
-                        return (T) (Long) Long.parseLong(String.valueOf(source));
-                    } catch (Exception e) {
-                        return (T) (Long) 0L;
-                    }
-                }
-            }
+        }
 
-            //可以返回自身
-            Class clz = null;
-            if (targetType instanceof ParameterizedType) {
-                clz = (Class) ((ParameterizedType) targetType).getRawType();
-            } else if (targetType instanceof Class) {
-                clz = (Class) targetType;
-            }
-            if (clz == null) {
-                return null;
-            }
-            if (clz == source.getClass()) {
-                return (T) source;
-            }
-            //目标为List
-            if (List.class.isAssignableFrom(clz)) {
+        //可以返回自身
+        Class clz = null;
+        if (targetType instanceof ParameterizedType) {
+            clz = (Class) ((ParameterizedType) targetType).getRawType();
+        } else if (targetType instanceof Class) {
+            clz = (Class) targetType;
+        }
+        if (clz == null) {
+            return null;
+        }
+        if (clz == source.getClass()) {
+            return (T) source;
+        }
+        //目标为List
+        if (List.class.isAssignableFrom(clz)) {
 //            if(Arr.class.isAssignableFrom(clz)){
 //                clz = Arr.class;
 //            }
 //            else
-                if (List.class == clz) {
-                    clz = (Class<T>) ArrayList.class;
-                }
-                Type[] types = null;
-                if (targetType instanceof ParameterizedType) {
-                    ParameterizedType p = (ParameterizedType) targetType;
-                    types = p.getActualTypeArguments();
-                }
-                List list = (List) newInstance(clz);
-                if (type.isArray()) {
-                    for (int i = 0; i < Array.getLength(source); i++) {
-                        list.add(Array.get(source, i));
-                    }
-                } else if (source instanceof List) {
-                    if (null != types && types.length > 0) {
-                        List collection = (List) source;
-                        for (Object o : collection) {
-                            list.add(cast(o, types[0]));
-                        }
-                    } else {
-                        ((List) list).addAll((Collection) source);
-                    }
-                }
-                return (T) list;
+            if (List.class == clz) {
+                clz = (Class<T>) ArrayList.class;
             }
-            //目标为set类型
-            if (Set.class.isAssignableFrom(clz)) {
-                if (Set.class == clz) {
-                    clz = (Class<T>) HashSet.class;
+            Type[] types = null;
+            if (targetType instanceof ParameterizedType) {
+                ParameterizedType p = (ParameterizedType) targetType;
+                types = p.getActualTypeArguments();
+            }
+            List list = (List) newInstance(clz);
+            if (type.isArray()) {
+                for (int i = 0; i < Array.getLength(source); i++) {
+                    list.add(Array.get(source, i));
                 }
-                Set list = (Set) newInstance(clz);
-                if (type.isArray()) {
-                    for (int i = 0; i < Array.getLength(source); i++) {
-                        list.add(Array.get(source, i));
+            } else if (source instanceof List) {
+                if (null != types && types.length > 0) {
+                    List collection = (List) source;
+                    for (Object o : collection) {
+                        list.add(cast(o, types[0]));
                     }
                 } else {
-                    list.addAll((Collection) source);
+                    ((List) list).addAll((Collection) source);
                 }
-                return (T) list;
             }
-            if (clz.isArray()) {
-                Class<?> arrType = clz.getComponentType();
-                Collection collection = (Collection) source;
-                Object narr = Array.newInstance(arrType, (collection.size()));
+            return (T) list;
+        }
+        //目标为set类型
+        if (Set.class.isAssignableFrom(clz)) {
+            if (Set.class == clz) {
+                clz = (Class<T>) HashSet.class;
+            }
+            Set list = (Set) newInstance(clz);
+            if (type.isArray()) {
+                for (int i = 0; i < Array.getLength(source); i++) {
+                    list.add(Array.get(source, i));
+                }
+            } else {
+                list.addAll((Collection) source);
+            }
+            return (T) list;
+        }
+        if (clz.isArray()) {
+            Class<?> arrType = clz.getComponentType();
+            Collection collection = (Collection) source;
+            Object narr = Array.newInstance(arrType, (collection.size()));
+            int i = 0;
+            for (Object o : collection) {
+                Array.set(narr, i, Json.cast(o, arrType));
+                i++;
+            }
+            return (T) narr;
+        }
+        //目标为map类型
+        if (Map.class.isAssignableFrom(clz)) {
+            if (Map.class == clz) {
+                clz = (Class<T>) HashMap.class;
+            }
+            Type[] types = null;
+            if (targetType instanceof ParameterizedType) {
+                ParameterizedType p = (ParameterizedType) targetType;
+                types = p.getActualTypeArguments();
+            }
+            Map map;
+            if (clz == Obj.class) {
+                map = new Obj();
+            } else {
+                map = (Map) newInstance(clz);
+            }
+            if (source instanceof Map) {
+                if (null != types && types.length > 1) {
+                    for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) source).entrySet()) {
+                        map.put(entry.getKey(), cast(entry.getValue(), (Class<T>) types[1]));
+                    }
+                } else {
+                    ((Map) map).putAll((Map) source);
+                }
+
+            } else if (source instanceof Collection) {
+                //原数据可以变成map，key为数字，element为值
                 int i = 0;
-                for (Object o : collection) {
-                    Array.set(narr, i, Json.cast(o, arrType));
+                for (Object o : ((Collection) source)) {
+                    map.put(i + "", o);
                     i++;
                 }
-                return (T) narr;
-            }
-            //目标为map类型
-            if (Map.class.isAssignableFrom(clz)) {
-                if (Map.class == clz) {
-                    clz = (Class<T>) HashMap.class;
-                }
-                Type[] types = null;
-                if (targetType instanceof ParameterizedType) {
-                    ParameterizedType p = (ParameterizedType) targetType;
-                    types = p.getActualTypeArguments();
-                }
-                Map map;
-                if(clz == Obj.class){
-                    map = new Obj();
-                } else {
-                    map = (Map) newInstance(clz);
-                }
-                if (source instanceof Map) {
-                    if (null != types && types.length > 1) {
-                        for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) source).entrySet()) {
-                            map.put(entry.getKey(), cast(entry.getValue(), (Class<T>) types[1]));
-                        }
-                    } else {
-                        ((Map) map).putAll((Map) source);
-                    }
-
-                }  else if(source instanceof Collection){
-                    //原数据可以变成map，key为数字，element为值
-                    int i = 0;
-                    for (Object o : ((Collection) source)) {
-                        map.put(i + "", o);
-                        i++;
-                    }
-                } else {
-                    map.putAll(beanToMap(source));
-                }
-                return (T) map;
-            }
-            //把目标当bean转换
-            //todo: 使用reflectasm
-            if (source instanceof Map) {
-                return (T) mapToBean((Map<Object, Object>) source, clz);
             } else {
-                return (T) beanToBean(source, clz);
+                map.putAll(beanToMap(source));
             }
+            return (T) map;
+        }
+        //把目标当bean转换
+        if (source instanceof Map) {
+            return (T) mapToBean((Map<Object, Object>) source, clz);
+        } else {
+            return (T) beanToBean(source, clz);
+        }
 
     }
 
@@ -588,21 +591,21 @@ public abstract class Json {
 //        }
 //    }
 
-    public static <T> T copy(T source){
+    public static <T> T copy(T source) {
         if (source == null) {
             return null;
         }
         return (T) beanToBean(source, newInstance(source.getClass()));
     }
 
-    private static Map beanToMap(Object source){
+    private static Map beanToMap(Object source) {
         Map ret = new HashMap();
         ClassInfo classInfo = getClassInfo(source.getClass());
-        classInfo.fields.forEach((k,v) -> {
+        classInfo.fields.forEach((k, v) -> {
             ret.put(k, getValue(source, v));
         });
         //getter
-        classInfo.getters.forEach((k,v) -> {
+        classInfo.getters.forEach((k, v) -> {
             try {
                 ret.put(k, v.invoke(source));
             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -621,6 +624,7 @@ public abstract class Json {
     private static <T> Object mapToBean(Map<Object, Object> source, Class<T> clz) {
         return mapToBean(source, clz, null);
     }
+
     private static <T> Object mapToBean(Map<Object, Object> source, Class<T> clz, T ins) {
         if (ins == null) {
             ins = newInstance(clz);
@@ -632,12 +636,12 @@ public abstract class Json {
             setValue(finalIns, v, cast(source.get(v.name), type));
         });
         //setter
-        info.setters.forEach((k,v) -> {
+        info.setters.forEach((k, v) -> {
             Type type = v.getGenericParameterTypes()[0];
             Object value = cast(source.get(k), type);
-            try{
+            try {
                 v.invoke(finalIns, value);
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
@@ -659,8 +663,9 @@ public abstract class Json {
         Map map = beanToMap(source);
         return mapToBean(map, clz);
     }
+
     private static <T> T beanToBean(Object source, T ins) {
         Map map = beanToMap(source);
-        return (T) mapToBean(map, (Class<T>)ins.getClass(), ins);
+        return (T) mapToBean(map, (Class<T>) ins.getClass(), ins);
     }
 }

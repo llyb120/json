@@ -158,37 +158,41 @@ public class Arr<X> implements List<X> {
                 .collect(Collectors.joining(ch));
     }
 
-    public <T> T find(Class<T> clz, ArrFilterFunc<T> func){
-        Arr items = filter( clz, func);
+//    public <T> T find(Class<T> clz, ArrFilterFunc<T> func){
+//        Arr items = filter( clz, func);
+//        if(items.isEmpty()){
+//            return null;
+//        }
+//        return (T) items.get(0);
+//    }
+
+    public Obj find(ArrFilterFunc<X> func){
+        Arr items = filter(func);
         if(items.isEmpty()){
             return null;
         }
-        return (T) items.get(0);
+        return (Obj) items.get(0);
     }
 
-    public Obj find(ArrFilterFunc<Obj> func){
-        return find(Obj.class, func);
-    }
-
-    public Arr filter(ArrFilterFunc<Obj> function){
+    public Arr filter(ArrFilterFunc<X> function){
         Arr ret = a();
         for (X t : this) {
-            if(function.call(ooo(t))){
+            if(function.call((t))){
                 ret.add(t);
             }
         }
         return ret;
     }
 
-    public <T> Arr filter(Class<T> clz, ArrFilterFunc<T> function){
-        Arr ret = a();
-        for (X t : this) {
-            if(function.call((T) t)){
-                ret.add(t);
-            }
-        }
-        return ret;
-    }
+//    public <T> Arr filter(Class<T> clz, ArrFilterFunc<T> function){
+//        Arr ret = a();
+//        for (X t : this) {
+//            if(function.call((T) t)){
+//                ret.add(t);
+//            }
+//        }
+//        return ret;
+//    }
 
     /**
      *

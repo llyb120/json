@@ -28,9 +28,14 @@ public class ReflectUtil {
 
     public static <T> T newInstance(Class<T> clz) {
         try {
-            return (T) unsafe.allocateInstance(clz);
+            return clz.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                return (T) unsafe.allocateInstance(clz);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         return null;
     }
