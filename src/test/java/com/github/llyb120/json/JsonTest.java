@@ -42,6 +42,14 @@ public class JsonTest {
                yield(a(1, 2, 3), e -> e > 2 ? "up" : "down"),
                 "ri","jian"
         );
+//
+//        Arr arr2 = a();
+//        for (Integer integer : a(1, 2, 3)) {
+//            arr2.add(integer > 2 ? "up" : "down");
+//        }
+//        arr2.add("ri");
+//        arr2.add("jian");
+
         System.out.println(arr.toString());
         assertEquals(arr.get(0), "down");
         assertEquals(arr.get(1), "down");
@@ -79,6 +87,9 @@ public class JsonTest {
         assertEquals(obj.ii("a"), 1);
         obj.put("b", 2);
         assertEquals(map.get("b"), 2);
+
+        Arr<Integer> arr = a(1, 2, 3);
+        System.out.println(ro(arr).toString());
 
 
 //        Ro r = new Ro();

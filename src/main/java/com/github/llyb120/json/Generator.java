@@ -7,24 +7,29 @@ import java.util.Map;
 
 public class Generator implements Iterable{
 
-    private Object source;
+    private Iterable arrSource;
+    private Map mapSource;
     private GeneratorFunc func;
 
-    public Generator(Object source, GeneratorFunc func) {
-        this.source = source;
+    public Generator(Iterable source, GeneratorFunc func) {
+        this.arrSource = source;
         this.func = func;
     }
 
+
+
     private List call(){
         List ret = new ArrayList<>();
-        if(source instanceof Iterable){
-            ((Iterable) source).forEach(e -> {
+        if (arrSource != null) {
+            for (Object o : arrSource) {
                 try {
-                    ret.add(func.call(e));
+                    ret.add(func.call(o));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-            });
+            }
+        } else if(mapSource != null){
+
         }
         return ret;
     }

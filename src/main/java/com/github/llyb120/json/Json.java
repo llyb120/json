@@ -220,6 +220,9 @@ public abstract class Json {
     public static <T> Generator yield(List<T> source, GeneratorFunc<T> func){
         return new Generator(source, func);
     }
+    public static <T> Generator yield(T[] source, GeneratorFunc<T> func){
+        return new Generator(Arrays.asList(source), func);
+    }
 
 
     public static Arr tree(Collection<? extends Map> list, String parentKey, String childKey) {
