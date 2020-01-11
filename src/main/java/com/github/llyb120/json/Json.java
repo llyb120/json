@@ -6,6 +6,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import sun.misc.Unsafe;
 
+import javax.swing.*;
 import java.io.Serializable;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
@@ -37,18 +38,24 @@ public abstract class Json {
     public static Obj o(Object... objects) {
         Obj json = new Obj();
         for (short i = 0; i < objects.length; i += 2) {
+            //当key为一个map的时候，ooo会自动展开该key
+            if (objects[i] instanceof Map) {
+                json.putAll((Map) objects[i]);
+                i--;
+                continue;
+            }
             //没这个元素了，则直接gg
             if (i + 1 >= objects.length) {
                 continue;
             }
             //如果key为null或undefined 则视为无效
             if (objects[i] == undefined || objects[i] == null) {
-                i--;
+//                i--;
                 continue;
             }
             Object value = objects[i + 1];
             //如果value为undefined，则无效
-            if (value == undefined || value == null) {
+            if (value == undefined) {
                 continue;
             }
             json.put((String) objects[i], value);
@@ -76,36 +83,40 @@ public abstract class Json {
         }
     }
 
+    @Deprecated
     public static Obj ooo(Object... objects) {
-        Obj json = new Obj();
-        for (short i = 0; i < objects.length; i += 2) {
-            if (objects[i] instanceof Map) {
-                json.putAll((Map) objects[i]);
-                continue;
-            }
-            //没这个元素了，则直接gg
-            if (i + 1 >= objects.length) {
-                continue;
-            }
-            //如果key为null或undefined 则视为无效
-            if (objects[i] == undefined || objects[i] == null) {
-                i--;
-                continue;
-            }
-            Object value = objects[i + 1];
-            //如果value为undefined，则无效
-            if (value == undefined || value == null) {
-                continue;
-            }
-            json.put((String) objects[i], value);
-        }
-        return json;
+        return o(objects);
+//        Obj json = new Obj();
+//        for (short i = 0; i < objects.length; i += 2) {
+//            //当key为一个map的时候，ooo会自动展开该key
+//            if (objects[i] instanceof Map) {
+//                json.putAll((Map) objects[i]);
+//                continue;
+//            }
+//            //没这个元素了，则直接gg
+//            if (i + 1 >= objects.length) {
+//                continue;
+//            }
+//            //如果key为null或undefined 则视为无效
+//            if (objects[i] == undefined || objects[i] == null) {
+//                i--;
+//                continue;
+//            }
+//            Object value = objects[i + 1];
+//            //如果value为undefined，则无效
+//            if (value == undefined || value == null) {
+//                continue;
+//            }
+//            json.put((String) objects[i], value);
+//        }
+//        return json;
     }
 
     public static Document bo(Object... objects) {
         return castBson(o(objects));
     }
 
+    @Deprecated
     public static Document booo(Object... objects) {
         return castBson(ooo(objects));
     }
@@ -119,6 +130,18 @@ public abstract class Json {
     }
 
 
+    private static void _dealList(List arr, Object object){
+        if (object == null) {
+            arr.add(object) ;
+        } else if (object instanceof Iterable) {
+            ((Iterable) object).forEach(arr::add);
+        } else if (object.getClass().getSimpleName().contains("[]")) {
+            //数组的情况
+            arr.addAll(Arrays.asList(object));
+        } else {
+            arr.add(object);
+        }
+    }
     /**
      * 该函数为a的升级版，相比较于普通的a，该函数有额外的行为
      * 1 null也被视作undefined
@@ -130,18 +153,43 @@ public abstract class Json {
      * @return
      */
     public static <T> Arr<T> aaa(Object... objects) {
-        Arr arr = a();
+        Arr arr = new Arr();
         for (Object object : objects) {
             if (object == null || object == undefined) {
                 continue;
             }
-            if (object instanceof Collection) {
-                arr.addAll((Collection) object);
-            } else if (object.getClass().getSimpleName().contains("[]")) {
-                //数组的情况
-                arr.addAll(Arrays.asList(objects));
-            } else if (object instanceof Iterable) {
-                ((Iterable) object).forEach(arr::add);
+            if(object instanceof Generator){
+                ((Generator) object).forEach(e ->{
+                    _dealList(arr, e);
+                });
+            } else {
+                _dealList(arr, object);
+            }
+//            if (object instanceof Iterable) {
+//                ((Iterable) object).forEach(arr::add);
+//            } else if (object.getClass().getSimpleName().contains("[]")) {
+//                //数组的情况
+//                arr.addAll(Arrays.asList(object));
+//            } else {
+//                arr.add(object);
+//            }
+        }
+        return arr;
+    }
+
+    public static <T> Arr<T> a(T... objects) {
+        Arr arr = new Arr();
+        for (T object : objects) {
+            if (object == undefined) {
+                continue;
+            }
+            if(object instanceof Generator){
+                ((Generator) object).forEach(e ->{
+                    if (e == null) {
+                        return;
+                    }
+                    arr.add(e);
+                });
             } else {
                 arr.add(object);
             }
@@ -159,16 +207,7 @@ public abstract class Json {
         return new Arr().list(list);
     }
 
-    public static <T> Arr<T> a(T... objects) {
-        Arr json = new Arr();
-        for (T object : objects) {
-            if (object == undefined) {
-                continue;
-            }
-            json.add(object);
-        }
-        return json;
-    }
+
 
 //    public static <T> List<T> la(T ...objects){
 //        return (List<T>) a(objects);
@@ -177,6 +216,10 @@ public abstract class Json {
 //    public static <T> List<T> laaa(Object ...objects){
 //        return (List<T>) aaa(objects);
 //    }
+
+    public static <T> Generator yield(List<T> source, GeneratorFunc<T> func){
+        return new Generator(source, func);
+    }
 
 
     public static Arr tree(Collection<? extends Map> list, String parentKey, String childKey) {

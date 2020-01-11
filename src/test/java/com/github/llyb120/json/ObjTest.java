@@ -69,6 +69,11 @@ public class ObjTest {
 //
 //        }
 
+        a(
+            yield(a(1,2,3), e -> {
+                return e > 2 ? "up" : "down";
+            })
+        );
 //        mo(
 //                "@for", a(1, 2, 3),
 //                "${item}", "@if item > 0", o("${item}", "fk"), "@else", 2, "@end",

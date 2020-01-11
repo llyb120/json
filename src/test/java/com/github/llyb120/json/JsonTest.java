@@ -10,8 +10,7 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.llyb120.json.Json.o;
-import static com.github.llyb120.json.Json.ro;
+import static com.github.llyb120.json.Json.*;
 import static org.junit.Assert.*;
 
 public class JsonTest {
@@ -35,6 +34,31 @@ public class JsonTest {
         raf.read(bs);
         Obj item = Json.parse(bs);
         System.out.println(item);
+    }
+
+    @Test
+    public void testYield() {
+        Arr arr = a(
+               yield(a(1, 2, 3), e -> e > 2 ? "up" : "down"),
+                "ri","jian"
+        );
+        System.out.println(arr.toString());
+        assertEquals(arr.get(0), "down");
+        assertEquals(arr.get(1), "down");
+        assertEquals(arr.get(2), "up");
+        arr = a(
+                yield(a(1,2,3), e -> a(e,"fuck")),
+                "ri","jian"
+
+        );
+        System.out.println(arr.toString());
+        assertEquals(arr.size(), 3 + 2);
+        arr = aaa(
+                yield(a(1,2,3), e -> a(e,"fuck")),
+                "ri","jian"
+        );
+        System.out.println(arr.toString());
+        assertEquals(arr.size(), 6 + 2);
     }
 
     static class Ro{
