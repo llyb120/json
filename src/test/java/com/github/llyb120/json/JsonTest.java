@@ -18,9 +18,9 @@ public class JsonTest {
     @Test
     public void testO() throws InterruptedException {
         Obj obj = o(
-                "a", 1,
-                "b", 2,
-                o("c", 1, "d", 2),
+                "const", 1,
+                o("innerMapKey1", 1, "innerMapKey2", 2),
+                "vIsObj", o(),
                 4, undefined,
                 a(1,2,3).yield(e -> o(e,true)),
                 o("aa",1, "bb", 2).yield((k,v) -> {
@@ -28,6 +28,17 @@ public class JsonTest {
                     return o(k, ++vv);
                 })
         );
+        assertEquals(obj.get("aa"), 2);
+        assertEquals(obj.get("bb"), 3);
+        assertFalse(obj.containsKey("4"));
+        assertEquals(obj.get("innerMapKey1"), 1);
+        assertEquals(obj.get("innerMapKey2"), 2);
+        assertEquals(obj.get("1"), true);
+        assertEquals(obj.get("2"), true);
+        assertEquals(obj.get("3"), true);
+        assertTrue(obj.o("vIsObj").isEmpty());
+        assertEquals(obj.get("const"), 1);
+
         System.out.println(obj.toString());
     }
 
