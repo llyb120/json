@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import static com.github.llyb120.json.Json.*;
 
 
-public class Arr<X> implements List<X> {
+public final class Arr<X> implements List<X> {
 
     private List list;
 
@@ -256,6 +256,10 @@ public class Arr<X> implements List<X> {
             return obj;
         }
         return this;
+    }
+
+    public Generator yield(GeneratorFunc<X> func){
+        return Json.yield(this, func);
     }
 
     @Override

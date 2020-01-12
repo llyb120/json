@@ -19,8 +19,16 @@ public class JsonTest {
     public void testO() throws InterruptedException {
         Obj obj = o(
                 "a", 1,
-                "b", 2
+                "b", 2,
+                o("c", 1, "d", 2),
+                4, undefined,
+                a(1,2,3).yield(e -> o(e,true)),
+                o("aa",1, "bb", 2).yield((k,v) -> {
+                    int vv = (int) v;
+                    return o(k, ++vv);
+                })
         );
+        System.out.println(obj.toString());
     }
 
     @Test
@@ -67,6 +75,15 @@ public class JsonTest {
         );
         System.out.println(arr.toString());
         assertEquals(arr.size(), 6 + 2);
+    }
+
+    @Test
+    public void testA() {
+        Arr arr = a(1, 2, 3);
+        assertEquals(arr.size(), 3);
+
+        arr = a(1,2, "...", a(1,2,3));
+        assertEquals(arr.size(), 5);
     }
 
     static class Ro{

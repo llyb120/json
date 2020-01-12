@@ -53,8 +53,14 @@ public class ObjTest {
 
 //    public Arr<Obj> ora(){
 //    }
-    
+//    public void ...(){
+//
+//    }
+
     public void tt() {
+        aaa(
+            a(1,2,3)
+        );
 //        Arr arr;
 //        for (int i = 0; i < arr.size(); i++) {
 //        }

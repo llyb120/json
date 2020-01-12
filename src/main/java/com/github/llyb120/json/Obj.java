@@ -10,7 +10,14 @@ import java.util.*;
 import static com.github.llyb120.json.Json.cast;
 import static com.github.llyb120.json.Json.castBson;
 
-public class Obj implements Map<String, Object> {
+public final class Obj implements Map<String, Object> {
+
+    //bson util
+    public static final String $match = "$match";
+    public static final String $project = "$project";
+    public static final String $sort = "$sort";
+
+    
 
     //    private boolean parallel = false;
 //    private ThreadLocal<Map<String,Object>> local;
@@ -331,6 +338,11 @@ public class Obj implements Map<String, Object> {
         }
         put(key, ret);
         return ret;
+    }
+
+
+    public Generator yield(MapGeneratorFunc<String,Object> func){
+        return Json.yield(this, func);
     }
 
     public Obj v(String key, Validate validate, String msg, Object... args) {

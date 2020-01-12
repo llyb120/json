@@ -10,12 +10,17 @@ public class Generator implements Iterable{
     private Iterable arrSource;
     private Map mapSource;
     private GeneratorFunc func;
+    private MapGeneratorFunc mapFunc;
 
     public Generator(Iterable source, GeneratorFunc func) {
         this.arrSource = source;
         this.func = func;
     }
 
+    public Generator(Map mapSource, MapGeneratorFunc func){
+        this.mapSource = mapSource;
+        this.mapFunc = func;
+    }
 
 
     private List call(){
@@ -29,7 +34,13 @@ public class Generator implements Iterable{
                 }
             }
         } else if(mapSource != null){
-
+            for (Object o : mapSource.entrySet()) {
+                try{
+                    ret.add(mapFunc.call(((Map.Entry) o).getKey(), ((Map.Entry) o).getValue()));
+                } catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
         }
         return ret;
     }

@@ -15,7 +15,7 @@ import java.util.*;
 import static com.github.llyb120.json.ReflectUtil.*;
 
 
-public abstract class Json {
+public final class Json {
     public static Undefined undefined = new Undefined();
 
 
@@ -35,30 +35,73 @@ public abstract class Json {
 //    public <T> T to(TypeReference<T> reference){
 //        return Json.cast(this, reference);
 //    }
+    private static int _dealMap(Map obj, Object key, Object value){
+        //展开key为map的元素
+        if(key instanceof Map){
+            obj.putAll((Map)key);
+            return 1;
+        }
+        //略过key为null或者undefined的键值对
+        if(key == null || key instanceof Undefined){
+            return 2;
+        }
+        //key为生成器
+        if(key instanceof Generator){
+            for(Object o : (Generator) key)  {
+                _dealMap(obj, o, null);
+            }
+            return 1;
+        }
+        //如果value为undefined，则无效
+        if (value instanceof Undefined) {
+            return 2;
+        }
+        //value为生成器
+//        if(value instanceof Generator){
+//        }
+        obj.put(key.toString(), value);
+        return 2;
+//        if (objects[i] instanceof Map) {
+//            json.putAll((Map) objects[i]);
+//            i--;
+//            continue;
+//        }
+//        //没这个元素了，则直接gg
+//        if (i + 1 >= objects.length) {
+//            continue;
+//        }
+//        //如果key为null或undefined 则视为无效
+//        if (objects[i] == undefined || objects[i] == null) {
+////                i--;
+//            continue;
+//        }
+//        //key为生成器
+//        if(objects[i] instanceof Generator){
+//            for(Object o : (Generator)objects[i])  {
+//
+//            }
+//        }
+//
+//        Object value = objects[i + 1];
+//        //如果value为undefined，则无效
+//        if (value == undefined) {
+//            continue;
+//        }
+//        json.put((String) objects[i], value);
+    }
+
     public static Obj o(Object... objects) {
         Obj json = new Obj();
-        for (short i = 0; i < objects.length; i += 2) {
+        int step;
+        for (short i = 0; i < objects.length; ) {
             //当key为一个map的时候，ooo会自动展开该key
-            if (objects[i] instanceof Map) {
-                json.putAll((Map) objects[i]);
-                i--;
-                continue;
+            Object key = objects[i];
+            Object value = null;
+            if(i + 1 < objects.length){
+                value = objects[i + 1];
             }
-            //没这个元素了，则直接gg
-            if (i + 1 >= objects.length) {
-                continue;
-            }
-            //如果key为null或undefined 则视为无效
-            if (objects[i] == undefined || objects[i] == null) {
-//                i--;
-                continue;
-            }
-            Object value = objects[i + 1];
-            //如果value为undefined，则无效
-            if (value == undefined) {
-                continue;
-            }
-            json.put((String) objects[i], value);
+            step = _dealMap(json, key, value);
+            i += step;
         }
         return json;
     }
@@ -142,6 +185,7 @@ public abstract class Json {
             arr.add(object);
         }
     }
+
     /**
      * 该函数为a的升级版，相比较于普通的a，该函数有额外的行为
      * 1 null也被视作undefined
@@ -152,6 +196,7 @@ public abstract class Json {
      * @param objects
      * @return
      */
+    @Deprecated
     public static <T> Arr<T> aaa(Object... objects) {
         Arr arr = new Arr();
         for (Object object : objects) {
@@ -179,19 +224,34 @@ public abstract class Json {
 
     public static <T> Arr<T> a(T... objects) {
         Arr arr = new Arr();
-        for (T object : objects) {
+        for (int i = 0; i < objects.length; i++) {
+            T object = objects[i];
             if (object == undefined) {
                 continue;
             }
+            boolean expand = false;
+            if(object.equals("...")){
+                expand = true;
+                object = objects[++i];
+            }
             if(object instanceof Generator){
+                boolean finalExpand = expand;
                 ((Generator) object).forEach(e ->{
                     if (e == null) {
                         return;
                     }
-                    arr.add(e);
+                    if(finalExpand){
+                        _dealList(arr, e);
+                    } else {
+                        arr.add(e);
+                    }
                 });
             } else {
-                arr.add(object);
+                if(expand){
+                    _dealList(arr, object);
+                } else {
+                    arr.add(object);
+                }
             }
         }
         return arr;
@@ -224,6 +284,9 @@ public abstract class Json {
         return new Generator(Arrays.asList(source), func);
     }
 
+    public static <X,Y> Generator yield(Map<X,Y> source, MapGeneratorFunc<X,Y> func){
+        return new Generator(source, func);
+    }
 
     public static Arr tree(Collection<? extends Map> list, String parentKey, String childKey) {
         Map map = new HashMap();
@@ -339,26 +402,26 @@ public abstract class Json {
 //    public Object toBson() {
 //        return castBson(this);
 //    }
-    protected static Object fromBson(Object object) {
-        if (object instanceof Collection) {
-            Arr arr = a();
-            Collection list = (Collection) object;
-            for (Object o : list) {
-                arr.add(fromBson(o));
-            }
-            ;
-            return arr;
-        } else if (object instanceof Map) {
-            Obj obj = o();
-            Map<Object, Object> map = (Map) object;
-            for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                obj.put((String) entry.getKey(), fromBson(entry.getValue()));
-            }
-            return obj;
-        } else {
-            return object;
-        }
-    }
+//    protected static Object fromBson(Object object) {
+//        if (object instanceof Collection) {
+//            Arr arr = a();
+//            Collection list = (Collection) object;
+//            for (Object o : list) {
+//                arr.add(fromBson(o));
+//            }
+//            ;
+//            return arr;
+//        } else if (object instanceof Map) {
+//            Obj obj = o();
+//            Map<Object, Object> map = (Map) object;
+//            for (Map.Entry<Object, Object> entry : map.entrySet()) {
+//                obj.put((String) entry.getKey(), fromBson(entry.getValue()));
+//            }
+//            return obj;
+//        } else {
+//            return object;
+//        }
+//    }
 
     protected static <T> T castBson(Object object) {
         if (object == null) return (T) object;
