@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 public class JsonTest {
 
     @Test
-    public void testO() throws InterruptedException {
+    public void testO() {
         Obj obj = o(
                 "const", 1,
                 o("innerMapKey1", 1, "innerMapKey2", 2),
@@ -130,5 +130,20 @@ public class JsonTest {
 //
 //        obj2.oo("map").put("ajian", "1");
 //        assertEquals(r.map.get("ajian"), "1");
+    }
+
+
+    @Test
+    public void testPick(){
+        Arr<Integer> list = a(
+                o("c", 1),
+                o("c", 2),
+                o("c", 3),
+                o("c", 4),
+                o("c", 5)
+        ).pick("*.c", Integer.class);
+        for (Integer integer : list) {
+            System.out.println(integer);
+        }
     }
 }

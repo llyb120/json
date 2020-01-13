@@ -258,6 +258,10 @@ public final class Arr<X> implements List<X> {
         return this;
     }
 
+    public <T> Arr<T> pick(String path, Class<T> clz){
+        return a();
+    }
+
     public Generator yield(GeneratorFunc<X> func){
         return Json.yield(this, func);
     }
