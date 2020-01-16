@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.llyb120.json.Json.*;
@@ -111,6 +112,18 @@ public class JsonTest {
 
 
         col.insertOne(doc);
+    }
+
+    @Test
+    public void test_ba(){
+        MongoClient client = new MongoClient("47.94.97.138");
+        MongoCollection<Document> col = client.getDatabase("test")
+                .getCollection("test");
+        col.deleteMany(bo());
+
+        List list = ba(o("a", 1), o("a", 2));
+        list.add(o("ohno", a("1,2,3", "4")));
+        col.insertMany(list);
     }
 
     static class Ro{

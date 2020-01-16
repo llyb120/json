@@ -175,8 +175,36 @@ public final class Json {
         return bo(objects);
     }
 
-    public static List<? extends Document> ba(Object... objects) {
-        return castBson(a(objects));
+    public static List ba(Object... objects) {
+        List list = new ArrayList(){
+            @Override
+            public Object set(int index, Object element) {
+                return super.set(index, Json.castBson(element));
+            }
+
+            @Override
+            public boolean add(Object o) {
+                return super.add(Json.castBson(o));
+            }
+
+            @Override
+            public void add(int index, Object element) {
+                super.add(index, Json.castBson(element));
+            }
+
+            @Override
+            public boolean addAll(Collection c) {
+                return super.addAll(Json.castBson(c));
+            }
+
+            @Override
+            public boolean addAll(int index, Collection c) {
+                return super.addAll(index, Json.castBson(c));
+            }
+        };
+        list.addAll(a(objects));
+        return list;
+//        return castBson(a(objects));
     }
 
     @Deprecated
