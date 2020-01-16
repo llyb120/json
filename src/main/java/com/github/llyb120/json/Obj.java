@@ -13,44 +13,11 @@ import static com.github.llyb120.json.Json.castBson;
 public final class Obj implements Map<String, Object> {
 
     //bson util
-    public static final String $match = "$match";
-    public static final String $project = "$project";
-    public static final String $sort = "$sort";
-
-    
-
-    //    private boolean parallel = false;
-//    private ThreadLocal<Map<String,Object>> local;
     private Map<String, Object> map;
-//    private Object ref;
-//    private ClassInfo classInfo;
 
-//    public static interface KVIterator<U>{
-//        void call(String k, U v) throws Exception;
-//    }
-
-    public Obj() {
+    Obj() {
         map = new LinkedHashMap<>();
     }
-
-    public Obj(Map map) {
-        this();
-        putAll(map);
-    }
-
-//    public Obj(boolean p){
-//        parallel = p;
-//        if(p){
-//            local = new ThreadLocal(){
-//                @Override
-//                protected Object initialValue() {
-//                    return new LinkedHashMap<>();
-//                }
-//            };
-//        } else {
-//            map = new LinkedHashMap<>();
-//        }
-//    }
 
     public Map<String, Object> map() {
         return map;
@@ -60,15 +27,6 @@ public final class Obj implements Map<String, Object> {
         this.map = map;
         return this;
     }
-
-//    Obj ref(Object ref){
-//        if (ref == null) {
-//            return this;
-//        }
-//        this.ref = ref;
-//        this.classInfo = ReflectUtil.getClassInfo(ref.getClass());
-//        return this;
-//    }
 
     @Override
     public int size() {
@@ -97,39 +55,6 @@ public final class Obj implements Map<String, Object> {
 
     @Override
     public Object put(String key, Object value) {
-//        if (ref != null && classInfo != null) {
-//            FieldInfo field = classInfo.fields.get(key);
-//            if (field != null) {
-//                Object nv = cast(value, field.field.getGenericType());
-//                if(field.field.getType().isAssignableFrom(value.getClass())){
-//
-//                }
-//                else if(value instanceof Obj){
-//                    if(nv instanceof Map){
-//                        ((Obj) value).map((Map) nv);
-//                    } else {
-//                        ((Obj) value).ref(nv);
-//                    }
-//                }
-//                ReflectUtil.setValue(ref, field, nv);
-//            }
-//            Method setter = classInfo.setters.get(key);
-//            if (setter != null) {
-//                Object nv = cast(value, setter.getGenericParameterTypes()[0]);
-//                if(value instanceof Obj){
-//                    if(nv instanceof Map){
-//                        ((Obj) value).map((Map) nv);
-//                    } else {
-//                        ((Obj) value).ref(nv);
-//                    }
-//                }
-//                try {
-//                    setter.invoke(ref, nv);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
         return map().put(key, value);
     }
 

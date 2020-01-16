@@ -1,6 +1,9 @@
 package com.github.llyb120.json;
 
 
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -95,6 +98,19 @@ public class JsonTest {
 
         arr = a(1,2, "...", a(1,2,3));
         assertEquals(arr.size(), 5);
+    }
+
+    @Test
+    public void test_bo(){
+        MongoClient client = new MongoClient("47.94.97.138");
+        MongoCollection<Document> col = client.getDatabase("test")
+                .getCollection("test");
+//                .insertOne((bo("fuck", o("fff","ff"))));
+        Document doc = bo("fuck", "1");
+        doc.put("ohohoh", o("fuck", "123321"));
+
+
+        col.insertOne(doc);
     }
 
     static class Ro{

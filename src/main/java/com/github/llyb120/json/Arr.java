@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import static com.github.llyb120.json.Json.*;
 
 
-public final class Arr<X> implements List<X> {
+public class Arr<X> implements List<X> {
 
     private List list;
 

@@ -16,14 +16,13 @@ import static com.github.llyb120.json.ReflectUtil.*;
 
 
 public final class Json {
-    public static Undefined undefined = new Undefined();
+    public static final Undefined undefined = new Undefined();
+    public static final String $match = "$match";
+    public static final String $project = "$project";
+    public static final String $sort = "$sort";
+    public static final String $expand = "...";
 
-
-    class Holder {
-        public List<Object> list;
-        public Map<String, Object> map;
-    }
-
+    private Json(){}
 
     /**
      * json
@@ -156,18 +155,31 @@ public final class Json {
     }
 
     public static Document bo(Object... objects) {
-        return castBson(o(objects));
+        Document document = new Document(){
+            @Override
+            public Object put(String key, Object value) {
+                return super.put(key, castBson(value));
+            }
+
+            @Override
+            public void putAll(Map<? extends String, ?> map) {
+                super.putAll(castBson(map));
+            }
+        };
+        document.putAll(o(objects));
+        return document;
     }
 
     @Deprecated
     public static Document booo(Object... objects) {
-        return castBson(ooo(objects));
+        return bo(objects);
     }
 
     public static List<? extends Document> ba(Object... objects) {
         return castBson(a(objects));
     }
 
+    @Deprecated
     public static List<? extends Document> baaa(Object... objects) {
         return castBson(aaa(objects));
     }
