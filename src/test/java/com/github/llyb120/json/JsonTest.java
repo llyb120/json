@@ -110,7 +110,6 @@ public class JsonTest {
         Document doc = bo("fuck", "1");
         doc.put("ohohoh", o("fuck", "123321"));
 
-
         col.insertOne(doc);
     }
 
