@@ -1,12 +1,17 @@
-package com.github.llyb120.json;
+package com.github.llyb120.json.reflect;
 
+import com.github.llyb120.json.Util;
+import com.github.llyb120.json.reflect.ClassInfo;
+import com.github.llyb120.json.reflect.FieldInfo;
 import sun.misc.Unsafe;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.math.BigDecimal;
+import java.text.Normalizer;
+import java.util.*;
 
 /**
  * 反射帮助类
@@ -91,6 +96,7 @@ public class ReflectUtil {
         }
         for (Field field : clz.getDeclaredFields()) {
             if (Modifier.isPublic(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())){
+                field.setAccessible(true);
                 String name = field.getName();
                 if(!info.fields.containsKey(name)) {
                     info.fields.put(name, new FieldInfo(field));
@@ -100,6 +106,7 @@ public class ReflectUtil {
         for (Method method : clz.getDeclaredMethods()) {
             if (Modifier.isPublic(method.getModifiers()) && !Modifier.isStatic(method.getModifiers())) {
                 String name = method.getName();
+                method.setAccessible(true);
                 if(name.startsWith("set") && name.length() > 3 && Util.isLetterUpper(name.charAt(3)) && method.getParameterCount() == 1 && "void".equals(method.getReturnType().getName())){
                     name = name.substring(3,4).toLowerCase() + name.substring(4);
                     if(!info.setters.containsKey(name)){
@@ -115,5 +122,92 @@ public class ReflectUtil {
             }
         }
         return info;
+    }
+
+    public static ClassType getType(Object object){
+        if (object == null) {
+            return ClassType.NULL;
+        }
+        if(object instanceof Collection){
+            return ClassType.COLLECTION;
+        }
+        if(object instanceof Map){
+            return ClassType.MAP;
+        }
+        if(object instanceof String){
+            return ClassType.STRING;
+        }
+        if(object instanceof Long){
+            return ClassType.LONG;
+        }
+        if(object instanceof Boolean){
+            return ClassType.BOOLEAN;
+        }
+        if(object instanceof Integer){
+            return ClassType.INTEGER;
+        }
+        if(object instanceof Double){
+            return ClassType.DOUBLE;
+        }
+        if(object instanceof Float){
+            return ClassType.FLOAT;
+        }
+        if(object instanceof Date){
+            return ClassType.DATE;
+        }
+        if(object instanceof BigDecimal){
+            return ClassType.BIG_DECIMAL;
+        }
+        Class clz = object.getClass();
+        if(clz.getSimpleName().contains("[]")){
+            return ClassType.ARRAY;
+        }
+
+        return ClassType.BEAN;
+    }
+
+    public static Map<String,Object> getValues(Object ins){
+            HashMap<String, Object> result = new HashMap<>();
+        ClassType classType = getType(ins);
+        if(classType == ClassType.COLLECTION){
+            int i = 0;
+            for (Object in : ((Collection) ins)) {
+                result.put(String.valueOf(i++), in);
+            }
+        }
+        if(classType == ClassType.MAP){
+           result.putAll((Map<? extends String, ?>) ins);
+           return result;
+        }
+        if(classType == ClassType.ARRAY){
+            int len = Array.getLength(ins);
+            for (int i = 0; i < len; i++) {
+                result.put(String.valueOf(i), Array.get(ins,i));
+            }
+            return result;
+        }
+        if(classType == ClassType.BEAN){
+            ClassInfo classInfo = getClassInfo(ins.getClass());
+            classInfo.fields.forEach((k,v) -> {
+                Object value = null;
+                try{
+                    value = v.field.get(ins);
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                result.put(k, value);
+            });
+            classInfo.getters.forEach((k,v) -> {
+                Object value = null;
+                try{
+                    value = v.invoke(ins);
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                result.put(k, value);
+            });
+            return result;
+        }
+        return result;
     }
 }

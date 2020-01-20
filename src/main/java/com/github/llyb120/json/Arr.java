@@ -1,5 +1,10 @@
 package com.github.llyb120.json;
 
+import com.github.llyb120.json.lambda.ArrFilterFunc;
+import com.github.llyb120.json.lambda.ArrGroupFunc;
+import com.github.llyb120.json.lambda.GeneratorFunc;
+import com.github.llyb120.json.selector.JsonPicker;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -259,7 +264,7 @@ public class Arr<X> implements List<X> {
     }
 
     public <T> Arr<T> pick(String path, Class<T> clz){
-        return a();
+        return JsonPicker.pick(path, this, clz);
     }
 
     public Generator yield(GeneratorFunc<X> func){

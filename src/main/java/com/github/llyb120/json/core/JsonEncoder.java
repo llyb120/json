@@ -1,7 +1,8 @@
-package com.github.llyb120.json;
+package com.github.llyb120.json.core;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import com.github.llyb120.json.lambda.JsonStr;
+import com.github.llyb120.json.reflect.ReflectUtil;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -9,6 +10,14 @@ import java.util.*;
 public class JsonEncoder {
     StringBuilder sb = new StringBuilder();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    StringifyOption option;
+
+    public JsonEncoder(StringifyOption option){
+        this.option = option;
+        if (option == null) {
+            this.option = new StringifyOption();
+        }
+    }
 
     public String stringify(Object obj) {
         sb.setLength(0);
@@ -19,6 +28,10 @@ public class JsonEncoder {
     private void encode(Object obj) {
         if (obj == null) {
             sb.append("null");
+            return;
+        }
+        if(obj instanceof JsonStr){
+            sb.append(((JsonStr) obj).toJsonString());
             return;
         }
         if (obj instanceof Map) {
@@ -77,6 +90,16 @@ public class JsonEncoder {
             sb.append("\"");
         } else if (obj.getClass().getName().equals("org.bson.types.Decimal128")) {
             sb.append(new BigDecimal(obj.toString()));
+        } else if(obj.getClass().getEnumConstants() != null){
+            try{
+//                Object[] consts = obj.getClass().getEnumConstants();
+                sb.append("\"");
+                sb.append(obj.toString());
+                sb.append("\"");
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+//            obj.getClass().getEnumConstants()
         } else {
             encodeEntity(obj);
         }
@@ -85,21 +108,33 @@ public class JsonEncoder {
     private void encodeEntity(Object obj) {
 //        FieldAccess fa = FieldAccess.get(obj.getClass());
 //        MethodAccess ma = MethodAccess.get(obj.getClass());
-        ClassInfo info = ReflectUtil.getClassInfo(obj.getClass());
-        int i = 0;
+//        ClassInfo info = ReflectUtil.getClassInfo(obj.getClass());
+//        int i = 0;
         sb.append("{");
-        info.fields.forEach((k,v) -> {
+        Map<String, Object> values = ReflectUtil.getValues(obj);
+        values.forEach((k,v) -> {
+            if(option.ignoreKeys().containsKey(k)){
+                return;
+            }
             sb.append("\"");
             sb.append(k);
             sb.append("\"");
             sb.append(":");
-            Object val = ReflectUtil.getValue(obj, v);//entry.getValue().get(obj);
-            encode(val);
+            encode(v);
             sb.append(",");
         });
+//        info.fields.forEach((k,v) -> {
+//            sb.append("\"");
+//            sb.append(k);
+//            sb.append("\"");
+//            sb.append(":");
+//            Object val = ReflectUtil.getValue(obj, v);//entry.getValue().get(obj);
+//            encode(val);
+//            sb.append(",");
+//        });
 
 //        String[] names = ma.getMethodNames();
-        for (Map.Entry<String, Method> entry : info.getters.entrySet()) {
+//        for (Map.Entry<String, Method> entry : info.getters.entrySet()) {
 //            String methodName = ennames[i];
 //            if(methodName.length() <= 3){
 //                continue;
@@ -112,19 +147,19 @@ public class JsonEncoder {
 //            Class[] types = ma.getParameterTypes()[i];
 //            Class retType = ma.getReturnTypes()[i];
 //            if (types.length == 0 && !"void".equals(retType.getName())) {
-            sb.append("\"");
-            sb.append(entry.getKey());
-            sb.append("\"");
-            sb.append(":");
-            Object val = null;
-            try {
-                val = entry.getValue().invoke(obj);
-            } catch (Exception e) {
-            }
-            encode(val);
-            sb.append(",");
+//            sb.append("\"");
+//            sb.append(entry.getKey());
+//            sb.append("\"");
+//            sb.append(":");
+//            Object val = null;
+//            try {
+//                val = entry.getValue().invoke(obj);
+//            } catch (Exception e) {
 //            }
-        }
+//            encode(val);
+//            sb.append(",");
+//            }
+//        }
         deleteLastComma();
         sb.append("}");
     }

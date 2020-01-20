@@ -1,14 +1,14 @@
 package com.github.llyb120.json;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import com.github.llyb120.json.lambda.FlexAction;
+import com.github.llyb120.json.lambda.MapGeneratorFunc;
+import com.github.llyb120.json.selector.JsonPicker;
+
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.github.llyb120.json.Json.cast;
-import static com.github.llyb120.json.Json.castBson;
 
 public final class Obj implements Map<String, Object> {
 
@@ -295,6 +295,10 @@ public final class Obj implements Map<String, Object> {
         }
 
         return this;
+    }
+
+    public <T> Arr<T> pick(String path, Class<T> clz){
+        return JsonPicker.pick(path, this, clz);
     }
 
 

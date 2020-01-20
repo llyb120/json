@@ -107,10 +107,15 @@ public class JsonTest {
         MongoCollection<Document> col = client.getDatabase("test")
                 .getCollection("test");
 //                .insertOne((bo("fuck", o("fff","ff"))));
-        Document doc = bo("fuck", "1");
-        doc.put("ohohoh", o("fuck", "123321"));
-
+        Document doc = bo("a", "1");
+        doc.put("b", "2");
         col.insertOne(doc);
+        //before 1.0.4 inserted {a:1}
+        //now inserted {a:1,b:2}
+
+        //1.0.4前达到相同效果需要这么写
+        col.insertOne(booo(doc));
+
     }
 
     @Test
@@ -123,6 +128,12 @@ public class JsonTest {
         List list = ba(o("a", 1), o("a", 2));
         list.add(o("ohno", a("1,2,3", "4")));
         col.insertMany(list);
+    }
+
+    @Test
+    public void stringify() {
+        String str = Json.stringify(new Ro());
+        System.out.println(str);
     }
 
     static class Ro{

@@ -1,18 +1,20 @@
 package com.github.llyb120.json;
 
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.github.llyb120.json.lambda.GeneratorFunc;
+import com.github.llyb120.json.lambda.MapGeneratorFunc;
+import com.github.llyb120.json.core.JsonEncoder;
+import com.github.llyb120.json.core.JsonParser;
+import com.github.llyb120.json.core.StringifyOption;
+import com.github.llyb120.json.reflect.ClassInfo;
+import com.github.llyb120.json.reflect.ReflectUtil;
 import org.bson.Document;
-import org.bson.conversions.Bson;
-import sun.misc.Unsafe;
 
-import javax.swing.*;
-import java.io.Serializable;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.github.llyb120.json.ReflectUtil.*;
+import static com.github.llyb120.json.reflect.ReflectUtil.*;
 
 
 public final class Json {
@@ -128,30 +130,6 @@ public final class Json {
     @Deprecated
     public static Obj ooo(Object... objects) {
         return o(objects);
-//        Obj json = new Obj();
-//        for (short i = 0; i < objects.length; i += 2) {
-//            //当key为一个map的时候，ooo会自动展开该key
-//            if (objects[i] instanceof Map) {
-//                json.putAll((Map) objects[i]);
-//                continue;
-//            }
-//            //没这个元素了，则直接gg
-//            if (i + 1 >= objects.length) {
-//                continue;
-//            }
-//            //如果key为null或undefined 则视为无效
-//            if (objects[i] == undefined || objects[i] == null) {
-//                i--;
-//                continue;
-//            }
-//            Object value = objects[i + 1];
-//            //如果value为undefined，则无效
-//            if (value == undefined || value == null) {
-//                continue;
-//            }
-//            json.put((String) objects[i], value);
-//        }
-//        return json;
     }
 
     public static Document bo(Object... objects) {
@@ -237,40 +215,41 @@ public final class Json {
      * @return
      */
     @Deprecated
-    public static <T> Arr<T> aaa(Object... objects) {
-        Arr arr = new Arr();
-        for (Object object : objects) {
-            if (object == null || object == undefined) {
-                continue;
-            }
-            if(object instanceof Generator){
-                ((Generator) object).forEach(e ->{
-                    _dealList(arr, e);
-                });
-            } else {
-                _dealList(arr, object);
-            }
-//            if (object instanceof Iterable) {
-//                ((Iterable) object).forEach(arr::add);
-//            } else if (object.getClass().getSimpleName().contains("[]")) {
-//                //数组的情况
-//                arr.addAll(Arrays.asList(object));
-//            } else {
-//                arr.add(object);
+    public static Arr aaa(Object... objects) {
+        return a($expand, objects);
+//        Arr arr = new Arr();
+//        for (Object object : objects) {
+//            if (object == null || object == undefined) {
+//                continue;
 //            }
-        }
-        return arr;
+//            if(object instanceof Generator){
+//                ((Generator) object).forEach(e ->{
+//                    _dealList(arr, e);
+//                });
+//            } else {
+//                _dealList(arr, object);
+//            }
+////            if (object instanceof Iterable) {
+////                ((Iterable) object).forEach(arr::add);
+////            } else if (object.getClass().getSimpleName().contains("[]")) {
+////                //数组的情况
+////                arr.addAll(Arrays.asList(object));
+////            } else {
+////                arr.add(object);
+////            }
+//        }
+//        return arr;
     }
 
     public static <T> Arr<T> a(T... objects) {
         Arr arr = new Arr();
         for (int i = 0; i < objects.length; i++) {
-            T object = objects[i];
+            Object object = objects[i];
             if (object == undefined) {
                 continue;
             }
             boolean expand = false;
-            if(object.equals("...")){
+            if(object.equals($expand)){
                 expand = true;
                 object = objects[++i];
             }
@@ -328,7 +307,7 @@ public final class Json {
         return new Generator(source, func);
     }
 
-    public static Arr tree(Collection<? extends Map> list, String parentKey, String childKey) {
+    public static Arr toTree(Collection<? extends Map> list, String parentKey, String childKey) {
         Map map = new HashMap();
         for (Map map1 : list) {
             Object key = map1.get(childKey);
@@ -404,9 +383,11 @@ public final class Json {
 //        return (T) item;
 //    }
 
-
     public static String stringify(Object obj) {
-        return new JsonEncoder().stringify(obj);
+        return stringify(obj, null);
+    }
+    public static String stringify(Object obj, StringifyOption option) {
+        return new JsonEncoder(option).stringify(obj);
     }
 
     public static <T> T parse(String str) {
@@ -739,6 +720,9 @@ public final class Json {
 //
 //        }
 //    }
+
+
+
 
     public static <T> T copy(T source) {
         if (source == null) {

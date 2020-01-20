@@ -1,4 +1,4 @@
-package com.github.llyb120.json;
+package com.github.llyb120.json.lambda;
 
 import java.util.Map;
 

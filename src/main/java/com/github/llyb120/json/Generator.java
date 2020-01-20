@@ -1,5 +1,8 @@
 package com.github.llyb120.json;
 
+import com.github.llyb120.json.lambda.GeneratorFunc;
+import com.github.llyb120.json.lambda.MapGeneratorFunc;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

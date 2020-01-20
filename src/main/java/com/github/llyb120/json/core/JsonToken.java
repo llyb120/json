@@ -1,4 +1,4 @@
-package com.github.llyb120.json;
+package com.github.llyb120.json.core;
 
 public class JsonToken {
     public JsonTokenType type;
