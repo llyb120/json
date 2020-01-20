@@ -89,4 +89,44 @@ public class ObjTest {
 //        ));
     }
 
+    @Test
+    public void pick() {
+        Obj item = o(
+                "a", 1,
+                "b", o(
+                        "c", a(1, o(
+                                "d", "fff"
+                        ))
+                ),
+                "array", a(
+                        o(
+                                "foo", o(
+                                        "key1",1,
+                                        "key2", 2,
+                                        "count", 10
+                                )
+                        ),
+                        o(
+                                "foo", o(
+                                        "key3",4,
+                                        "key4", 5,
+                                        "count", 100
+                                )
+                        ),
+                        o(
+                                "foo", o("count", 1000)
+                        ),
+                        o(
+                                "foo", o("count", 10000)
+                        )
+                )
+        );
+        int total = 0;
+        for (Integer integer : item.pick("foo[key1]+foo[key3] count", int.class)) {
+            total += integer;
+        }
+        assertEquals(total, 110);
+        System.out.println(total);
+    }
+
 }
