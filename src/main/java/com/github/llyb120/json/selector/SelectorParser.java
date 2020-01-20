@@ -131,6 +131,7 @@ public final class SelectorParser {
                     continue;
                 } else if(ch == '*'){
                    op = PropertyOperatorType.CONTAINS;
+                   go();
                     key = getToken();
                     continue;
                 }

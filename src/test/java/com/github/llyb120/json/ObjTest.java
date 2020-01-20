@@ -2,7 +2,10 @@ package com.github.llyb120.json;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.github.llyb120.json.Json.*;
@@ -61,6 +64,15 @@ public class ObjTest {
         aaa(
             a(1,2,3)
         );
+        List list = new ArrayList();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        list.add(5);
+        Map map = new HashMap();
+        map.put("a", 1);
+        map.put("b", 2);
 //        Arr arr;
 //        for (int i = 0; i < arr.size(); i++) {
 //        }
@@ -103,14 +115,16 @@ public class ObjTest {
                                 "foo", o(
                                         "key1",1,
                                         "key2", 2,
-                                        "count", 10
+                                        "count", 10,
+                                        "test","aaa"
                                 )
                         ),
                         o(
                                 "foo", o(
                                         "key3",4,
                                         "key4", 5,
-                                        "count", 100
+                                        "count", 100,
+                                        "test", "bbb"
                                 )
                         ),
                         o(
@@ -126,7 +140,17 @@ public class ObjTest {
             total += integer;
         }
         assertEquals(total, 110);
-        System.out.println(total);
+        total = 0;
+        for (Integer integer : item.pick("foo[test*=a]+foo[test*=b] count", int.class)) {
+           total += integer;
+        }
+        assertEquals(total, 110);
+        total = 0;
+        for (Integer integer : item.pick("foo[test!=aaa]+foo[test*=b] count", int.class)) {
+            total += integer;
+        }
+        assertEquals(total, 11100);
+
     }
 
 }
