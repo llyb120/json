@@ -84,8 +84,8 @@ public class JsonTest {
         );
         System.out.println(arr.toString());
         assertEquals(arr.size(), 3 + 2);
-        arr = aaa(
-                yield(a(1,2,3), e -> a(e,"fuck")),
+        arr = a(
+                $expand, yield(a(1,2,3), e -> a(e,"fuck")),
                 "ri","jian"
         );
         System.out.println(arr.toString());
@@ -114,6 +114,7 @@ public class JsonTest {
         //now inserted {a:1,b:2}
 
         //1.0.4前达到相同效果需要这么写
+        col.deleteMany(bo());
         col.insertOne(booo(doc));
 
     }
