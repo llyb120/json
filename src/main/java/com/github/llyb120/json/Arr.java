@@ -266,6 +266,9 @@ public class Arr<X> implements List<X> {
     public <T> Arr<T> pick(String path, Class<T> clz){
         return JsonPicker.pick(path, this, clz);
     }
+    public Arr pick(String path){
+        return JsonPicker.pick(path, this, Object.class);
+    }
 
     public Generator yield(GeneratorFunc<X> func){
         return Json.yield(this, func);

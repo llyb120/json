@@ -301,6 +301,10 @@ public final class Obj implements Map<String, Object> {
         return JsonPicker.pick(path, this, clz);
     }
 
+    public Arr pick(String path){
+        return JsonPicker.pick(path, this, Object.class);
+    }
+
 
 //    public <T> T toBson() {
 //        return castBson(this);
