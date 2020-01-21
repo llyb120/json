@@ -1,3 +1,3 @@
 # json
 
-[文档地址](https://llyb120.github.io/json/doc/dist/index.html)
+[文档地址](https://github.com/llyb120/json/wiki)
