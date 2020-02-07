@@ -52,7 +52,7 @@ public class JsonTest {
 
     @Test
     public void parse() throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("E:\\work\\json\\test\\1.json5", "r");
+        RandomAccessFile raf = new RandomAccessFile("D:\\work\\json\\test\\1.json5", "r");
         byte[] bs = new byte[(int) raf.length()];
         raf.read(bs);
         Obj item = Json.parse(bs);

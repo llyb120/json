@@ -4,9 +4,11 @@ import com.github.llyb120.json.lambda.ArrFilterFunc;
 import com.github.llyb120.json.lambda.ArrGroupFunc;
 import com.github.llyb120.json.lambda.GeneratorFunc;
 import com.github.llyb120.json.selector.JsonPicker;
+import org.bson.Document;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.llyb120.json.Json.*;
 
@@ -209,6 +211,11 @@ public class Arr<X> implements List<X> {
                 .toArray());
     }
 
+    public Stream<Obj> os(){
+        return this.stream()
+            .map(Json::ro);
+    }
+
 
     public String s(int i){
         if(i >= size()){
@@ -277,6 +284,11 @@ public class Arr<X> implements List<X> {
     @Override
     public String toString() {
         return Json.stringify(this);
+    }
+
+    @Deprecated
+    public List<Document> toBson(){
+        return ba($expand, this);
     }
 
     //    public List<? extends Bson> toBsonArray(){

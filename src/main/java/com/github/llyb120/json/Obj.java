@@ -4,10 +4,12 @@ package com.github.llyb120.json;
 import com.github.llyb120.json.lambda.FlexAction;
 import com.github.llyb120.json.lambda.MapGeneratorFunc;
 import com.github.llyb120.json.selector.JsonPicker;
+import org.bson.Document;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.github.llyb120.json.Json.bo;
 import static com.github.llyb120.json.Json.cast;
 
 public final class Obj implements Map<String, Object> {
@@ -342,5 +344,10 @@ public final class Obj implements Map<String, Object> {
     @Override
     public String toString() {
         return Json.stringify(this);
+    }
+
+    @Deprecated
+    public Document toBson(){
+        return bo(this);
     }
 }
