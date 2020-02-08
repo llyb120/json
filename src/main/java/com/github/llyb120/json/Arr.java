@@ -7,6 +7,7 @@ import com.github.llyb120.json.selector.JsonPicker;
 import org.bson.Document;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -206,14 +207,24 @@ public class Arr<X> implements List<X> {
      */
     @Deprecated
     public Arr<Obj> oa(){
-        return aaa(this.stream()
+        Arr<?> arr = this;
+        return aaa(arr.stream()
                 .map(Json::ro)
                 .toArray());
     }
 
     public Stream<Obj> os(){
-        return this.stream()
+        Arr<?> arr = this;
+        return arr.stream()
             .map(Json::ro);
+    }
+
+    public void ofor(Consumer<? super Obj> action){
+        Arr<?> arr = this;
+        for (Object o : arr) {
+            Obj obj = ro(o);
+            action.accept(obj);
+        }
     }
 
 
@@ -240,11 +251,11 @@ public class Arr<X> implements List<X> {
         return this;
     }
 
-    public <U> Obj group(ArrGroupFunc<U> function){
+    public Obj group(ArrGroupFunc<X> function){
         Obj cache = Json.o();
         for (X t : this) {
             try {
-                String key = (String) function.call((U)t);
+                String key = (String) function.call((X)t);
                 Arr arr = cache.aa(key);
                 if (arr == null) {
                     cache.put(key, arr = a());
@@ -289,6 +300,11 @@ public class Arr<X> implements List<X> {
     @Deprecated
     public List<Document> toBson(){
         return ba($expand, this);
+    }
+
+    @Deprecated
+    public <T> T to(Class<T> clz){
+        return Json.cast(this, clz);
     }
 
     //    public List<? extends Bson> toBsonArray(){

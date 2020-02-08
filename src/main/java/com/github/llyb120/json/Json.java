@@ -153,7 +153,7 @@ public final class Json {
         return bo(objects);
     }
 
-    public static List ba(Object... objects) {
+    public static List<Document> ba(Object... objects) {
         List list = new ArrayList(){
             @Override
             public Object set(int index, Object element) {
@@ -194,11 +194,23 @@ public final class Json {
     private static void _dealList(List arr, Object object){
         if (object == null) {
             arr.add(object) ;
+        } else if(object instanceof Undefined){
+            return;
         } else if (object instanceof Iterable) {
-            ((Iterable) object).forEach(arr::add);
+            ((Iterable) object).forEach(e -> {
+                if (!(e instanceof Undefined)) {
+                    arr.add(e);
+                }
+            });
         } else if (object.getClass().getSimpleName().contains("[]")) {
             //数组的情况
-            arr.addAll(Arrays.asList(object));
+            int len = Array.getLength(object);
+            for (int i = 0; i < len; i++) {
+                Object obj = Array.get(object, i);
+                if(!(obj instanceof Undefined)){
+                   arr.add(obj);
+                }
+            }
         } else {
             arr.add(object);
         }
@@ -282,8 +294,8 @@ public final class Json {
      * @param list
      * @return
      */
-    public static Arr ra(List list) {
-        return new Arr().list(list);
+    public static <T> Arr<T> ra(List<T> list) {
+        return new Arr<T>().list(list);
     }
 
 

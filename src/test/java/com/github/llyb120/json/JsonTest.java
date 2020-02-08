@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.List;
@@ -185,5 +186,11 @@ public class JsonTest {
         for (Integer integer : list) {
             System.out.println(integer);
         }
+    }
+
+    @Test
+    public void testExpand(){
+        Arr<Serializable> arr = a($expand, new Object[]{undefined, undefined});
+        assertEquals(arr.size(), 0);
     }
 }

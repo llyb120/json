@@ -340,6 +340,13 @@ public final class Obj implements Map<String, Object> {
 //        }
 //    }
 
+    public Object or(Object obj){
+        if(isEmpty()){
+            return obj;
+        }
+        return this;
+    }
+
 
     @Override
     public String toString() {
@@ -349,5 +356,10 @@ public final class Obj implements Map<String, Object> {
     @Deprecated
     public Document toBson(){
         return bo(this);
+    }
+
+    @Deprecated
+    public <T> T to(Class<T> clz){
+        return Json.cast(this, clz);
     }
 }
