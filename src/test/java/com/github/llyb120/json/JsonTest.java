@@ -151,8 +151,8 @@ public class JsonTest {
 
     @Test
     public void eq() {
-        Obj o1 = o("a", 1);
-        Obj o2 = o("a", 1);
+        Object o1 = o("a", 1);
+        Object o2 = o("a", 1);
         assertTrue(Json.eq(o1, o2));
 
         o1 = o("a", 1);
@@ -169,6 +169,10 @@ public class JsonTest {
         o2 = o(
                 "a", new test()
         );
+        assertTrue(Json.eq(o1, o2));
+
+        o1 = a(1,2,3);
+        o2 = o("0", 1, 1, 2, 2, 3);
         assertTrue(Json.eq(o1, o2));
     }
 
