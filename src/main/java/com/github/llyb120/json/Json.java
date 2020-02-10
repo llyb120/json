@@ -7,12 +7,14 @@ import com.github.llyb120.json.core.JsonEncoder;
 import com.github.llyb120.json.core.JsonParser;
 import com.github.llyb120.json.core.StringifyOption;
 import com.github.llyb120.json.reflect.ClassInfo;
+import com.github.llyb120.json.reflect.ClassType;
 import com.github.llyb120.json.reflect.ReflectUtil;
 import org.bson.Document;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.github.llyb120.json.reflect.ReflectUtil.*;
 
@@ -228,7 +230,16 @@ public final class Json {
      */
     @Deprecated
     public static Arr aaa(Object... objects) {
-        return a($expand, objects);
+        Object[] args = Arrays.stream(objects)
+                .flatMap(e -> {
+                    if (e instanceof Collection) {
+                        return ((Collection) e).stream();
+                    } else {
+                        return Arrays.asList(e).stream();
+                    }
+                })
+                .toArray();
+        return a(args);
 //        Arr arr = new Arr();
 //        for (Object object : objects) {
 //            if (object == null || object == undefined) {
@@ -261,7 +272,7 @@ public final class Json {
                 continue;
             }
             boolean expand = false;
-            if(object.equals($expand)){
+            if($expand.equals(object)){
                 expand = true;
                 object = objects[++i];
             }
@@ -410,6 +421,32 @@ public final class Json {
 
     public static <T> T parse(byte[] bs) {
         return parse(new String(bs));
+    }
+
+    private static boolean canEq(Object o){
+        ClassType t1 = getType(o);
+        return t1 == ClassType.COLLECTION || t1 == ClassType.BEAN || t1 == ClassType.ARRAY || t1 == ClassType.MAP;
+    }
+    public static boolean eq(Object o1, Object o2){
+        boolean flag  = Objects.equals(o1, o2);
+        if(flag){
+            return true;
+        }
+        if(canEq(o1) && canEq(o2)){
+            Map m1 = ReflectUtil.getValues(o1);
+            Map m2 = ReflectUtil.getValues(o2);
+            HashSet<String> set = new HashSet<>();
+            set.addAll(m1.keySet());
+            set.addAll(m2.keySet());
+            for (String o : set) {
+                if(!eq(m1.get(o), m2.get(o))){
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

@@ -100,6 +100,17 @@ public class JsonTest {
 
         arr = a(1,2, "...", a(1,2,3));
         assertEquals(arr.size(), 5);
+
+        arr = a(null, null);
+        assertEquals(arr.size(),2);
+
+        arr = a($expand, a());
+        assertEquals(arr.size(), 0);
+        arr = aaa(a());
+        assertEquals(arr.size(), 0);
+
+        arr = aaa(a(1,2,3,4));
+        assertEquals(arr.size(), 4);
     }
 
     @Test
@@ -136,6 +147,29 @@ public class JsonTest {
     public void stringify() {
         String str = Json.stringify(new Ro());
         System.out.println(str);
+    }
+
+    @Test
+    public void eq() {
+        Obj o1 = o("a", 1);
+        Obj o2 = o("a", 1);
+        assertTrue(Json.eq(o1, o2));
+
+        o1 = o("a", 1);
+        o2 = o("a", "1");
+        assertFalse(Json.eq(o1, o2));
+
+        class test{
+            public int a = 1;
+        }
+
+        o1 = o(
+                "a", o("a", 1)
+        );
+        o2 = o(
+                "a", new test()
+        );
+        assertTrue(Json.eq(o1, o2));
     }
 
     static class Ro{
