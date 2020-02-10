@@ -6,34 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class SelectorParser {
-    private char[] chars;
-    private int ptr = 0;
+public final class SelectorParser extends AbstractSelectorParser{
     private StringBuilder sb = new StringBuilder();
 
     public SelectorParser(String selector){
-        this.chars = selector.toCharArray();
+        super(selector);
     }
-
-    public char next(){
-        return chars[ptr++];
-    }
-
-    public void go(){
-        ptr++;
-    }
-
-    public char peek(){
-        if(ptr >= chars.length){
-            return (char) -1;
-        }
-        return chars[ptr];
-    }
-
-    public boolean hasNext(){
-        return ptr < chars.length;
-    }
-
 
     //parser
     public List<SelectorNode> parse(){
