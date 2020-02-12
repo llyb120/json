@@ -6,6 +6,7 @@ import com.github.llyb120.json.lambda.GeneratorFunc;
 import com.github.llyb120.json.selector.JsonPicker;
 import org.bson.Document;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -14,7 +15,7 @@ import java.util.stream.Stream;
 import static com.github.llyb120.json.Json.*;
 
 
-public class Arr<X> implements List<X> {
+public class Arr<X> implements List<X>, Serializable {
 
     private List list;
 

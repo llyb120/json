@@ -17,7 +17,10 @@ public class MongoSelectorParserTest {
         query = "b.a[c*=2]";
         getList(query);
 
-        getList("orgs[][a=1 and (b=2 or c=3)]");
+        getList("orgs[a=1 and (b=2 or c=3)]");
+        MongoSelectorParser parser = new MongoSelectorParser("orgs[a=1 and (b=2 or c=3)]");
+        List<MongoSelectorToken> list = parser.parse();
+        parser.buildAst();
     }
 
     private List getList(String query){
