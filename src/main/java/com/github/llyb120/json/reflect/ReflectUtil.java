@@ -92,35 +92,41 @@ public class ReflectUtil {
         ClassInfo info = new ClassInfo();
         Class clzz = clz;
         while(clzz != null && clzz != Object.class){
+
+            for (Field field : clzz.getDeclaredFields()) {
+                if (Modifier.isPublic(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())){
+                    field.setAccessible(true);
+                    String name = field.getName();
+                    if(!info.fields.containsKey(name)) {
+                        info.fields.put(name, new FieldInfo(field));
+                    }
+                }
+            }
+            for (Method method : clzz.getDeclaredMethods()) {
+                if(method.getName().equals("getClass")){
+                    continue;
+                }
+                if (Modifier.isPublic(method.getModifiers()) && !Modifier.isStatic(method.getModifiers())) {
+                    String name = method.getName();
+                    method.setAccessible(true);
+                    if(name.startsWith("set") && name.length() > 3 && Util.isLetterUpper(name.charAt(3)) && method.getParameterCount() == 1 && "void".equals(method.getReturnType().getName())){
+                        name = name.substring(3,4).toLowerCase() + name.substring(4);
+                        if(!info.setters.containsKey(name)){
+                            info.setters.put(name, method);
+                        }
+                    }
+                    if(name.startsWith("get") && name.length() > 3 && Util.isLetterUpper(name.charAt(3)) && method.getParameterCount() == 0){
+                        name = name.substring(3,4).toLowerCase() + name.substring(4);
+                        if(!info.getters.containsKey(name)){
+                            info.getters.put(name, method);
+                        }
+                    }
+                }
+            }
+
             clzz = clzz.getSuperclass();
         }
-        for (Field field : clz.getDeclaredFields()) {
-            if (Modifier.isPublic(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())){
-                field.setAccessible(true);
-                String name = field.getName();
-                if(!info.fields.containsKey(name)) {
-                    info.fields.put(name, new FieldInfo(field));
-                }
-            }
-        }
-        for (Method method : clz.getDeclaredMethods()) {
-            if (Modifier.isPublic(method.getModifiers()) && !Modifier.isStatic(method.getModifiers())) {
-                String name = method.getName();
-                method.setAccessible(true);
-                if(name.startsWith("set") && name.length() > 3 && Util.isLetterUpper(name.charAt(3)) && method.getParameterCount() == 1 && "void".equals(method.getReturnType().getName())){
-                    name = name.substring(3,4).toLowerCase() + name.substring(4);
-                    if(!info.setters.containsKey(name)){
-                        info.setters.put(name, method);
-                    }
-                }
-                if(name.startsWith("get") && name.length() > 3 && Util.isLetterUpper(name.charAt(3)) && method.getParameterCount() == 0){
-                    name = name.substring(3,4).toLowerCase() + name.substring(4);
-                    if(!info.getters.containsKey(name)){
-                        info.getters.put(name, method);
-                    }
-                }
-            }
-        }
+
         return info;
     }
 

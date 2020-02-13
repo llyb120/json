@@ -1,12 +1,19 @@
 package com.github.llyb120.json.mongo;
 
+import com.github.llyb120.json.Json;
+import com.github.llyb120.json.Obj;
 import com.github.llyb120.json.Util;
 import com.github.llyb120.json.error.ErrorMongoSelectorException;
 import com.github.llyb120.json.selector.AbstractSelectorParser;
+import org.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+
+import static com.github.llyb120.json.Json.o;
+import static com.github.llyb120.json.mongo.MongoSelectorItemType.*;
 
 public final class MongoSelectorParser extends AbstractSelectorParser {
     private StringBuilder sb = new StringBuilder();
@@ -47,7 +54,10 @@ public final class MongoSelectorParser extends AbstractSelectorParser {
                 if(left == -1 && !blank){
                     left = ptr;
                 }
-                if(left > -1 && (blank||end)){
+                if(left > -1 && end){
+                    right = ptr + 1;
+                }
+                else if(left > -1 && blank){
                     right = ptr;
                 }
 
@@ -93,40 +103,133 @@ public final class MongoSelectorParser extends AbstractSelectorParser {
     public void buildAst(){
         int len = tokens.size();
         LinkedList<Integer> lastBlock = new LinkedList<>();
+        LinkedList<Integer> lastBracket = new LinkedList<>();
         while(tokenPtr < len){
             MongoSelectorToken token = peekToken();
             if (token == null) {
                break;
             }
-            if(token.type == MongoSelectorItemType.TOKEN_OP_BLOCK_LEFT){
+            if(token.type == TOKEN_BRACKET_LEFT){
+                stack.add(token);
+                lastBracket.add(tokenPtr);// = tokenPtr;
+            } else if (token.type == TOKEN_BRACKET_RIGHT) {
+                stack.add(token);
+                ass(!lastBracket.isEmpty());
+                ass(stack.size() > 2);
+                mergeBracket(stack.size() - 3);
+            } else if (token.type == MongoSelectorItemType.TOKEN_BLOCK_LEFT) {
                 stack.add(token);
                 lastBlock.add(tokenPtr);// = tokenPtr;
             }
             //规约描述表达式
-            else if(token.type == MongoSelectorItemType.TOKEN_OP_BLOCK_RIGHT){
-                if(!lastBlock.isEmpty()){
-                    mergeBlock(lastBlock.removeLast(), stack.size());
+            else if (token.type == MongoSelectorItemType.TOKEN_BLOCK_RIGHT) {
+                stack.add(token);
+                ass(!lastBlock.isEmpty());
+                if(lastBlock.getLast() == tokenPtr - 1){
+                    lastBlock.removeLast();
+                } else {
+                    if(stack.size() > 5){
+                        //检查是否数组匹配
+                        if(stack.get(stack.size() - 5).type == TOKEN_BLOCK_LEFT && stack.get(stack.size() - 4).type == TOKEN_BLOCK_RIGHT){
+                            lastBlock.removeLast();
+                            mergeBlock(stack.size() - 6);
+                        } else if(tokens.get(lastBlock.getLast() - 1).type == TOKEN_KEYWORD){
+                            lastBlock.removeLast();
+                            mergeBlock(stack.size() - 4);
+                        }
+                    } else if(stack.size() > 3){
+                        if(tokens.get(lastBlock.getLast() - 1).type == TOKEN_KEYWORD){
+                            lastBlock.removeLast();
+                            mergeBlock(stack.size() - 4);
+                        }
+                    } else {
+                        ass(false);
+                    }
+//                    if(lastBlock.size() == 6){
+//                        mergeBlock(stack.size() - 6);
+//                    } else if(lastBlock.size() == 4){
+//                        mergeBlock(stack.size() - 4);
+//                    } else {
+//                        ass(false);
+//                    }
+//                    int d = 2;
                 }
-                //如果是描述
-                MongoSelectorItem node = getStackLast();
-                if(node instanceof MongoSelectorNode){
-                    ass(stack.size() > 1);
-                    MongoSelectorToken keyword = (MongoSelectorToken) stack.get(stack.size() - 2);
-                    ass(keyword.type == MongoSelectorItemType.TOKEN_KEYWORD);
-                    stack.remove(stack.size() - 2);
-                    ((MongoSelectorNode) node).left = keyword;
+//                if (!lastBlock.isEmpty()) {
+//                    mergeBlock(lastBlock.removeLast());
+//                }
+//                //如果是描述
+//                MongoSelectorItem node = getStackLast();
+//                if (node instanceof MongoSelectorNode) {
+//                    ass(stack.size() > 1);
+//                    MongoSelectorToken keyword = (MongoSelectorToken) stack.get(stack.size() - 2);
+//                    ass(keyword.type == MongoSelectorItemType.TOKEN_KEYWORD);
+//                    stack.remove(stack.size() - 2);
+//                    ((MongoSelectorNode) node).left = keyword;
+//                }
+            } else if (token.type == MongoSelectorItemType.TOKEN_KEYWORD) {
+                stack.add(token);
+                if (stack.size() > 2 && isOP(stack.get(stack.size() - 2))) {
+                    mergeExpression(stack.size() - 3);
                 }
-            }
-            else if(token.type == MongoSelectorItemType.TOKEN_KEYWORD){
+            } else {
                 stack.add(token);
             }
-            else if(isOP(token)){
-//                assertToken(stack.getLast(), MongoSelectorTokenType.KEYWORD);
-//                assertToken(nextToken(), MongoSelectorTokenType.KEYWORD);
+
+            //处理and和or
+            if(token.type != TOKEN_BLOCK_LEFT  && token.type != TOKEN_BRACKET_LEFT ){
+                if(stack.size() > 2){
+                    MongoSelectorItemType type = stack.get(stack.size() - 2).type;
+                    if(stack.get(stack.size() -3).type == NODE_EXPRESSION && stack.get(stack.size() -1).type == NODE_EXPRESSION){
+                        if(type == TOKEN_AND){
+                            mergeAnd(stack.size() - 3);
+                        } else if(type == TOKEN_OR){
+                            mergeOr(stack.size() - 3);
+                        }
+                    }
+                }
             }
             tokenPtr++;
         }
-        int d = 2;
+        ass(stack.size() == 1);
+        System.out.println(Json.stringify(stack));
+    }
+
+    public Object calculate(MongoSelectorNode node, Obj context){
+        if (node == null) {
+            node = (MongoSelectorNode) stack.get(0);
+        }
+        Object left = null;
+        Object right = null;
+        if(node.left instanceof MongoSelectorNode){
+            left = calculate((MongoSelectorNode) node.left, context);
+        } else if(node.left instanceof MongoSelectorToken){
+            left = context.s(((MongoSelectorToken) node.left).value);
+        }
+        if(node.right instanceof MongoSelectorNode){
+            right = calculate((MongoSelectorNode) node.right, context);
+        } else if(node.right instanceof MongoSelectorToken){
+            right = String.valueOf(((MongoSelectorToken) node.right).value);
+        }
+        switch (node.value){
+            case TOKEN_OR:
+                return ((boolean) left) || ((boolean) right);
+            case TOKEN_AND:
+                return ((boolean) left) && ((boolean) right);
+            case TOKEN_OP_EQ:
+                return Objects.equals(left, right);
+
+            case NODE_MATCH:
+                Obj nc = context.get(((MongoSelectorToken) node.left).value, Obj.class);
+                if (nc == null) {
+                    nc = o();
+                }
+                return calculate((MongoSelectorNode) node.right, nc);
+            case NODE_ELEM_MATCH:
+                return false;
+
+
+        }
+        return null;
     }
 
     private MongoSelectorItem getStackLast(){
@@ -140,30 +243,86 @@ public final class MongoSelectorParser extends AbstractSelectorParser {
         }
     }
 
-    private MongoSelectorNode mergeBlock(int from, int to){
-        MongoSelectorNode node = new MongoSelectorNode();
-        node.type = MongoSelectorItemType.NODE_DESCRIBE;
-
-        List<MongoSelectorItem> list = stack.subList(from, to);
-        if(list.isEmpty()){
-            throw new ErrorMongoSelectorException();
-        }
-        Object target = list.get(0);
-        //弹出元素
-        int i = stack.size();
-        while(--i >= 0){
-            Object removed = stack.remove(i);
-            if(removed == target){
-                break;
-            }
-        }
-
+    private MongoSelectorNode mergeAnd(int from){
+        List<MongoSelectorItem> list = stack.subList(from, stack.size());
+        ass(list.size() == 3);
+        MongoSelectorNode node = new MongoSelectorNode(NODE_EXPRESSION);
+        node.left = list.get(0);
+        node.right = list.get(2);
+        node.value = TOKEN_AND;
+        stackDelTo(list.get(0));
         stack.add(node);
         return node;
     }
 
-    private boolean isOP(MongoSelectorToken token){
-        return token.type.name().startsWith("OP_");
+    private MongoSelectorNode mergeOr(int from){
+        List<MongoSelectorItem> list = stack.subList(from, stack.size());
+        ass(list.size() == 3);
+        MongoSelectorNode node = new MongoSelectorNode(NODE_EXPRESSION);
+        node.left = list.get(0);
+        node.right = list.get(2);
+        node.value = TOKEN_OR;
+        stackDelTo(list.get(0));
+        stack.add(node);
+        return node;
+    }
+
+    private MongoSelectorNode mergeExpression(int from){
+        List<MongoSelectorItem> list = stack.subList(from, stack.size());
+        ass(list.size() == 3);
+        MongoSelectorNode node = new MongoSelectorNode(NODE_EXPRESSION);
+        node.value = list.get(1).type;
+        node.left = list.get(0);
+        node.right = list.get(2);
+        stackDelTo(list.get(0));
+        stack.add(node);
+        return node;
+    }
+
+    private void stackDelTo(MongoSelectorItem item){
+        //弹出元素
+        int i = stack.size();
+        while(--i >= 0){
+            Object removed = stack.remove(i);
+            if(removed == item){
+                break;
+            }
+        }
+    }
+
+    private MongoSelectorNode mergeBlock(int from){
+        List<MongoSelectorItem> list = stack.subList(from, stack.size());
+        MongoSelectorNode node = null;
+        if(list.size() == 4){
+            node = new MongoSelectorNode(NODE_EXPRESSION);
+            node.value = NODE_MATCH;
+            node.left = list.get(0);
+            node.right = list.get(2);
+        } else if(list.size() == 6){
+            node = new MongoSelectorNode(NODE_EXPRESSION);
+            node.value = NODE_ELEM_MATCH;
+            node.left = list.get(0);
+            node.right = list.get(4);
+        } else {
+            ass(false);
+        }
+        stackDelTo(list.get(0));
+        stack.add(node);
+        return node;
+    }
+
+    private MongoSelectorNode mergeBracket(int from){
+        List<MongoSelectorItem> list = stack.subList(from, stack.size());
+        ass(list.size() == 3);
+        MongoSelectorItem item = list.get(1);
+        ass(item instanceof MongoSelectorNode);
+        stackDelTo(list.get(0));
+        stack.add(item);
+        return (MongoSelectorNode) item;
+    }
+
+    private boolean isOP(MongoSelectorItem token){
+        return token.type.name().startsWith("TOKEN_OP_");
     }
 
     private MongoSelectorToken nextToken(){
@@ -213,6 +372,8 @@ public final class MongoSelectorParser extends AbstractSelectorParser {
             case '<':
             case '!':
             case '*':
+            case '&':
+            case '|':
                 return true;
         }
         return false;

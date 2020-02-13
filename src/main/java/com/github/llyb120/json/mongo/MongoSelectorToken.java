@@ -8,19 +8,19 @@ public class MongoSelectorToken extends MongoSelectorItem{
         this.value = value;
         switch (value){
             case "[":
-                type = MongoSelectorItemType.TOKEN_OP_BLOCK_LEFT;
+                type = MongoSelectorItemType.TOKEN_BLOCK_LEFT;
                 break;
 
             case "]":
-                type = MongoSelectorItemType.TOKEN_OP_BLOCK_RIGHT;
+                type = MongoSelectorItemType.TOKEN_BLOCK_RIGHT;
                 break;
 
             case "(":
-                type = MongoSelectorItemType.TOKEN_OP_BRACKET_LEFT;
+                type = MongoSelectorItemType.TOKEN_BRACKET_LEFT;
                 break;
 
             case ")":
-                type = MongoSelectorItemType.TOKEN_OP_BRACKET_RIGHT;
+                type = MongoSelectorItemType.TOKEN_BRACKET_RIGHT;
                 break;
 
             case ">":
@@ -39,7 +39,7 @@ public class MongoSelectorToken extends MongoSelectorItem{
                 type = MongoSelectorItemType.TOKEN_OP_LTE;
                 break;
 
-            case "=":
+            case "==":
                 type = MongoSelectorItemType.TOKEN_OP_EQ;
                 break;
 
@@ -47,11 +47,11 @@ public class MongoSelectorToken extends MongoSelectorItem{
                 type = MongoSelectorItemType.TOKEN_OP_NEQ;
                 break;
 
-            case "and":
+            case "&&":
                 type = MongoSelectorItemType.TOKEN_AND;
                 break;
 
-            case "or":
+            case "||":
                 type = MongoSelectorItemType.TOKEN_OR;
                 break;
 
