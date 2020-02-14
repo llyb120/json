@@ -117,56 +117,62 @@ public final class MongoSelectorParser extends AbstractSelectorParser {
                 ass(!lastBracket.isEmpty());
                 ass(stack.size() > 2);
                 mergeBracket(stack.size() - 3);
-            } else if (token.type == MongoSelectorItemType.TOKEN_BLOCK_LEFT) {
-                stack.add(token);
-                lastBlock.add(tokenPtr);// = tokenPtr;
+                //如果前面可以规约成描述
+                if(stack.size() > 1 && stack.get(stack.size() - 2).type == TOKEN_KEYWORD){
+                    mergeMatch(stack.size() - 2);
+                }
             }
-            //规约描述表达式
-            else if (token.type == MongoSelectorItemType.TOKEN_BLOCK_RIGHT) {
-                stack.add(token);
-                ass(!lastBlock.isEmpty());
-                if(lastBlock.getLast() == tokenPtr - 1){
-                    lastBlock.removeLast();
-                } else {
-                    if(stack.size() > 5){
-                        //检查是否数组匹配
-                        if(stack.get(stack.size() - 5).type == TOKEN_BLOCK_LEFT && stack.get(stack.size() - 4).type == TOKEN_BLOCK_RIGHT){
-                            lastBlock.removeLast();
-                            mergeBlock(stack.size() - 6);
-                        } else if(tokens.get(lastBlock.getLast() - 1).type == TOKEN_KEYWORD){
-                            lastBlock.removeLast();
-                            mergeBlock(stack.size() - 4);
-                        }
-                    } else if(stack.size() > 3){
-                        if(tokens.get(lastBlock.getLast() - 1).type == TOKEN_KEYWORD){
-                            lastBlock.removeLast();
-                            mergeBlock(stack.size() - 4);
-                        }
-                    } else {
-                        ass(false);
-                    }
-//                    if(lastBlock.size() == 6){
-//                        mergeBlock(stack.size() - 6);
-//                    } else if(lastBlock.size() == 4){
-//                        mergeBlock(stack.size() - 4);
+//            else if (token.type == MongoSelectorItemType.TOKEN_BLOCK_LEFT) {
+//                stack.add(token);
+//                lastBlock.add(tokenPtr);// = tokenPtr;
+//            }
+//            //规约描述表达式
+//            else if (token.type == MongoSelectorItemType.TOKEN_BLOCK_RIGHT) {
+//                stack.add(token);
+//                ass(!lastBlock.isEmpty());
+//                if(lastBlock.getLast() == tokenPtr - 1){
+//                    lastBlock.removeLast();
+//                } else {
+//                    if(stack.size() > 5){
+//                        //检查是否数组匹配
+//                        if(stack.get(stack.size() - 5).type == TOKEN_BLOCK_LEFT && stack.get(stack.size() - 4).type == TOKEN_BLOCK_RIGHT){
+//                            lastBlock.removeLast();
+//                            mergeBlock(stack.size() - 6);
+//                        } else if(tokens.get(lastBlock.getLast() - 1).type == TOKEN_KEYWORD){
+//                            lastBlock.removeLast();
+//                            mergeBlock(stack.size() - 4);
+//                        }
+//                    } else if(stack.size() > 3){
+//                        if(tokens.get(lastBlock.getLast() - 1).type == TOKEN_KEYWORD){
+//                            lastBlock.removeLast();
+//                            mergeBlock(stack.size() - 4);
+//                        }
 //                    } else {
 //                        ass(false);
 //                    }
-//                    int d = 2;
-                }
-//                if (!lastBlock.isEmpty()) {
-//                    mergeBlock(lastBlock.removeLast());
+////                    if(lastBlock.size() == 6){
+////                        mergeBlock(stack.size() - 6);
+////                    } else if(lastBlock.size() == 4){
+////                        mergeBlock(stack.size() - 4);
+////                    } else {
+////                        ass(false);
+////                    }
+////                    int d = 2;
 //                }
-//                //如果是描述
-//                MongoSelectorItem node = getStackLast();
-//                if (node instanceof MongoSelectorNode) {
-//                    ass(stack.size() > 1);
-//                    MongoSelectorToken keyword = (MongoSelectorToken) stack.get(stack.size() - 2);
-//                    ass(keyword.type == MongoSelectorItemType.TOKEN_KEYWORD);
-//                    stack.remove(stack.size() - 2);
-//                    ((MongoSelectorNode) node).left = keyword;
-//                }
-            } else if (token.type == MongoSelectorItemType.TOKEN_KEYWORD) {
+////                if (!lastBlock.isEmpty()) {
+////                    mergeBlock(lastBlock.removeLast());
+////                }
+////                //如果是描述
+////                MongoSelectorItem node = getStackLast();
+////                if (node instanceof MongoSelectorNode) {
+////                    ass(stack.size() > 1);
+////                    MongoSelectorToken keyword = (MongoSelectorToken) stack.get(stack.size() - 2);
+////                    ass(keyword.type == MongoSelectorItemType.TOKEN_KEYWORD);
+////                    stack.remove(stack.size() - 2);
+////                    ((MongoSelectorNode) node).left = keyword;
+////                }
+//            }
+            else if (token.type == MongoSelectorItemType.TOKEN_KEYWORD) {
                 stack.add(token);
                 if (stack.size() > 2 && isOP(stack.get(stack.size() - 2))) {
                     mergeExpression(stack.size() - 3);
@@ -241,6 +247,29 @@ public final class MongoSelectorParser extends AbstractSelectorParser {
         if(!flag){
             throw new ErrorMongoSelectorException();
         }
+    }
+
+    private MongoSelectorNode mergeMatch(int from){
+        List<MongoSelectorItem> list = stack.subList(from, stack.size());
+        ass(list.size() == 2);
+        ass(list.get(1).type == NODE_EXPRESSION);
+        MongoSelectorItem key = list.get(0);
+        ass(key.type == TOKEN_KEYWORD);
+        MongoSelectorNode node = new MongoSelectorNode(NODE_EXPRESSION);
+        if(((MongoSelectorToken)key).value.endsWith("..")){
+            node.value = NODE_ELEM_MATCH;
+            ((MongoSelectorToken) key).value = ((MongoSelectorToken) key).value.substring(0, ((MongoSelectorToken) key).value.length() - 2);
+        } else if(((MongoSelectorToken)key).value.endsWith(".")){
+            node.value = NODE_MATCH;
+            ((MongoSelectorToken) key).value = ((MongoSelectorToken) key).value.substring(0, ((MongoSelectorToken) key).value.length() - 1);
+        } else {
+            ass(false);
+        }
+        node.left = key;
+        node.right = list.get(1);
+        stackDelTo(list.get(0));
+        stack.add(node);
+        return node;
     }
 
     private MongoSelectorNode mergeAnd(int from){
