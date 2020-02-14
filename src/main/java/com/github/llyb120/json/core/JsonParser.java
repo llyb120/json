@@ -195,7 +195,7 @@ public class JsonParser {
 //                ptr += 2;
 //                continue;
 //            }
-            if(isLineComment()){
+            else if(isLineComment()){
                 //读到末尾
                 ptr += 2;
                 while(ptr < len){
@@ -207,7 +207,7 @@ public class JsonParser {
                 }
                 ch = str.charAt(ptr);
             }
-            if(isMultipleCommentStart()){
+            else if(isMultipleCommentStart()){
                 ptr += 2;
                 while(ptr < len){
                     if(isMultipleCommentEnd()){

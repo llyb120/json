@@ -5,7 +5,6 @@ import com.github.llyb120.json.Obj;
 import com.github.llyb120.json.Util;
 import com.github.llyb120.json.error.ErrorMongoSelectorException;
 import com.github.llyb120.json.selector.AbstractSelectorParser;
-import org.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
