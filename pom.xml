@@ -6,7 +6,7 @@
 
     <groupId>com.github.llyb120</groupId>
     <artifactId>json</artifactId>
-    <version>1.0.11</version>
+    <version>1.1.2</version>
     <build>
         <plugins>
             <plugin>
@@ -24,12 +24,20 @@
 
 
         <!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver -->
+<!--        <dependency>-->
+<!--            <groupId>org.mongodb</groupId>-->
+<!--            <artifactId>mongodb-driver</artifactId>-->
+<!--            <version>3.12.0</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
+            <artifactId>bson</artifactId>
             <version>3.12.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

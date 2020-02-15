@@ -18,7 +18,7 @@ public final class Obj implements Map<String, Object>, Serializable {
     //bson util
     private Map<String, Object> map;
 
-    Obj() {
+    public Obj() {
         map = new LinkedHashMap<>();
     }
 
