@@ -1,5 +1,7 @@
 package com.github.llyb120.json;
 
+import java.io.Closeable;
+
 public class Util {
 
     public static boolean isEmpty(CharSequence str) {
@@ -48,6 +50,48 @@ public class Util {
             return true;
         } else {
             return true;
+        }
+    }
+
+
+    /**
+     * 关闭<br>
+     * 关闭失败不会抛出异常
+     *
+     * @param closeable 被关闭的对象
+     */
+    public static void close(Closeable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                // 静默关闭
+            }
+        }
+    }
+
+    /**
+     * 关闭<br>
+     * 关闭失败不会抛出异常
+     *
+     * @param closeable 被关闭的对象
+     */
+    public static void close(AutoCloseable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                // 静默关闭
+            }
+        }
+    }
+
+    public static void closeIfPossible(Object object){
+        if(object instanceof Closeable){
+            close((Closeable) object);
+        }
+        else if(object instanceof AutoCloseable){
+            close((AutoCloseable) object);
         }
     }
 

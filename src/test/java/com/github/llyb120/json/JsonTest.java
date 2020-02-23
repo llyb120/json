@@ -1,8 +1,8 @@
 package com.github.llyb120.json;
 
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
+//import com.mongodb.MongoClient;
+//import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.junit.Test;
 
@@ -115,32 +115,32 @@ public class JsonTest {
 
     @Test
     public void test_bo(){
-        MongoClient client = new MongoClient("47.94.97.138");
-        MongoCollection<Document> col = client.getDatabase("test")
-                .getCollection("test");
+//        MongoClient client = new MongoClient("47.94.97.138");
+//        MongoCollection<Document> col = client.getDatabase("test")
+//                .getCollection("test");
 //                .insertOne((bo("fuck", o("fff","ff"))));
         Document doc = bo("a", "1");
         doc.put("b", "2");
-        col.insertOne(doc);
+//        col.insertOne(doc);
         //before 1.0.4 inserted {a:1}
         //now inserted {a:1,b:2}
 
         //1.0.4前达到相同效果需要这么写
-        col.deleteMany(bo());
-        col.insertOne(booo(doc));
+//        col.deleteMany(bo());
+//        col.insertOne(booo(doc));
 
     }
 
     @Test
     public void test_ba(){
-        MongoClient client = new MongoClient("47.94.97.138");
-        MongoCollection<Document> col = client.getDatabase("test")
-                .getCollection("test");
-        col.deleteMany(bo());
+//        MongoClient client = new MongoClient("47.94.97.138");
+//        MongoCollection<Document> col = client.getDatabase("test")
+//                .getCollection("test");
+//        col.deleteMany(bo());
 
         List list = ba(o("a", 1), o("a", 2));
         list.add(o("ohno", a("1,2,3", "4")));
-        col.insertMany(list);
+//        col.insertMany(list);
     }
 
     @Test
