@@ -26,12 +26,14 @@ public class HttpHeadDecoder implements Decoder{
         pos += 4;
         str = str.substring(0, pos);
         context.position = pos;
+        context.limit = n;
         String[] lines = str.split("\r\n");
         if(lines.length == 0){
             throw new IOException();
         }
         HttpContext httpContext = new HttpContext();
-        context.data.put("httpContext", httpContext);
+        context.data = httpContext;
+//        context.data.put("httpContext", httpContext);
         //first must be path
         String[] arr = lines[0].split("\\s+");
         if(arr.length != 3){

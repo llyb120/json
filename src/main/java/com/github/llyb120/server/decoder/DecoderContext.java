@@ -1,5 +1,6 @@
 package com.github.llyb120.server.decoder;
 
+import com.github.llyb120.json.Arr;
 import com.github.llyb120.json.Obj;
 import com.github.llyb120.server.BufferPool;
 
@@ -13,7 +14,8 @@ public class DecoderContext {
     public OutputStream os;
     public byte[] buffer;
     public int position = -1;
-    public Obj data = o();
+    public int limit = -1;
+    public Object data;
 
     public DecoderContext(){
         buffer = BufferPool.get(4096);

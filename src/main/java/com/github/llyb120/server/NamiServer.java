@@ -32,7 +32,7 @@ public class NamiServer {
         this.threadPool = Executors.newFixedThreadPool(maxThread + 1);
     }
 
-    public NamiServer addDecoder(HttpHeadDecoder decoder){
+    public NamiServer addDecoder(Decoder decoder){
         decoders.add(decoder);
         return this;
     }
