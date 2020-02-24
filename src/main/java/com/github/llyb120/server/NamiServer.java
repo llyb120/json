@@ -25,12 +25,12 @@ public class NamiServer {
     private int port;
     private Queue<BaseHandler> decoders = new ConcurrentLinkedQueue<>();
 
-    public NamiServer(int port, int maxThread){
+    public NamiServer(int port, int maxThread) {
         this.port = port;
         this.threadPool = Executors.newFixedThreadPool(maxThread + 1);
     }
 
-    public NamiServer addHandler(BaseHandler decoder){
+    public NamiServer addHandler(BaseHandler decoder) {
         decoders.add(decoder);
         return this;
     }
@@ -77,9 +77,9 @@ public class NamiServer {
                     key = it.next();
                     it.remove();
 //                    Async.execute(() -> {
-                    try{
+                    try {
                         handleInput(key);
-                    } catch (IOException e){
+                    } catch (IOException e) {
                         key.cancel();
                         Util.close(key.channel());
                     }
@@ -104,8 +104,7 @@ public class NamiServer {
             sc.configureBlocking(false);
             //注册到多路复用器上，并设置为可读状态
             sc.register(selector, SelectionKey.OP_READ);
-        }
-        else if (key.isReadable()) {
+        } else if (key.isReadable()) {
             //读取数据
             key.cancel();
             SocketChannel sc = (SocketChannel) key.channel();
@@ -116,27 +115,25 @@ public class NamiServer {
     }
 
     private void handle(SocketChannel sc) {
-        try{
+        try {
             sc.configureBlocking(true);
             sc.setOption(TCP_NODELAY, true);
             HandlerContext context = new HandlerContext();
             Exception lastException = null;
             for (BaseHandler decoder : decoders) {
-                if(lastException == null){
-                   if(decoder instanceof Decoder){
-                       try {
-                           ((Decoder) decoder).decode(sc, context);
-                       } catch (Exception e) {
-                           lastException = e;
-                       }
-                   } else if(decoder instanceof Handler){
-                       try {
-                           ((Handler) decoder).handle(sc, context);
-                       } catch (Exception e) {
-                           lastException = e;
-                       }
-                   }
-                } else if(decoder instanceof ErrorHandler){
+                if (decoder instanceof Decoder) {
+                    try {
+                        ((Decoder) decoder).decode(sc, context);
+                    } catch (Exception e) {
+                        lastException = e;
+                    }
+                } else if (decoder instanceof Handler) {
+                    try {
+                        ((Handler) decoder).handle(sc, context);
+                    } catch (Exception e) {
+                        lastException = e;
+                    }
+                } else if (decoder instanceof ErrorHandler && lastException != null) {
                     try {
                         ((ErrorHandler) decoder).handle(sc, context, lastException);
                     } catch (Exception e) {
@@ -148,10 +145,10 @@ public class NamiServer {
             if (lastException != null) {
                 throw lastException;
             }
-        } catch (Exception e){
-          e.printStackTrace();
-        }  finally {
-           Util.close(sc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            Util.close(sc);
         }
     }
 

@@ -15,6 +15,7 @@ public class HttpContext {
     public Obj query = o();
 
     //response
+    public int responseStatus = -1;
     public Obj responseHeaders = o();
 
     //返回给前端的值

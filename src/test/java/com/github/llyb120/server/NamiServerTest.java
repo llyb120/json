@@ -32,7 +32,7 @@ public class NamiServerTest {
 //                ).toString())
 //                .execute();
 
-        Thread.sleep(100000);
+//        Thread.sleep(100000);
     }
 
 }
