@@ -17,14 +17,12 @@ public class HttpHeadDecoder implements Decoder{
         context.os = new BufferedOutputStream(Channels.newOutputStream(sc));
         int n = context.is.read(context.buffer);
         if (n < 0) {
-            //socket error
-            throw new IOException();
+            return;
         }
         String str = new String(context.buffer, 0, n);
         int pos = str.indexOf("\r\n\r\n");
         if(pos == -1){
-            //head error
-            throw new IOException();
+            return;
         }
         pos += 4;
         str = str.substring(0, pos);
@@ -32,7 +30,7 @@ public class HttpHeadDecoder implements Decoder{
         context.limit = n;
         String[] lines = str.split("\r\n");
         if(lines.length == 0){
-            throw new IOException();
+            return;
         }
         HttpContext httpContext = new HttpContext();
         context.data = httpContext;
@@ -40,7 +38,7 @@ public class HttpHeadDecoder implements Decoder{
         //first must be path
         String[] arr = lines[0].split("\\s+");
         if(arr.length != 3){
-            throw new IOException();
+            return;
         }
         httpContext.method = HttpContext.HttpMethod.valueOf(arr[0].toUpperCase());
         //decode path
