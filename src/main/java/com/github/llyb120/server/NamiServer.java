@@ -112,7 +112,7 @@ public class NamiServer {
             threadPool.submit(() -> {
                 try {
                     handle(sc);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
                     Util.close(sc);
@@ -131,6 +131,7 @@ public class NamiServer {
                 break;
             }
         }
+        context.os.flush();
     }
 
 }

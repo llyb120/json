@@ -1,9 +1,8 @@
 package com.github.llyb120.server.decoder;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.SocketChannel;
 
@@ -12,6 +11,7 @@ public class HttpHeadDecoder implements Decoder{
     @Override
     public boolean decode(SocketChannel sc, DecoderContext context) throws IOException {
         context.is = new BufferedInputStream(Channels.newInputStream(sc));
+        context.os = new BufferedOutputStream(Channels.newOutputStream(sc));
         int n = context.is.read(context.buffer);
         if (n < 0) {
             //socket error
@@ -44,7 +44,7 @@ public class HttpHeadDecoder implements Decoder{
         for (int i = 1; i < lines.length; i++) {
             int _i = lines[i].indexOf(":");
             if(_i > -1){
-                httpContext.headers.put(lines[i].substring(0, _i), lines[i].substring(_i + 1).trim());
+                httpContext.requestHeaders.put(lines[i].substring(0, _i), lines[i].substring(_i + 1).trim());
             }
         }
         return true;
