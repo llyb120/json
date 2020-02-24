@@ -6,12 +6,16 @@ import com.github.llyb120.json.Obj;
 import static com.github.llyb120.json.Json.o;
 
 public class HttpContext {
+    //request
     public Obj requestHeaders = o();
-    public Obj responseHeaders = o();
     public HttpMethod method;
     public String path;
     public Obj mapBody;
     public Arr arrBody;
+    public Obj query = o();
+
+    //response
+    public Obj responseHeaders = o();
 
     //返回给前端的值
     public Object retValue;

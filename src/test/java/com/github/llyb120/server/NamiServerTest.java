@@ -13,9 +13,9 @@ public class NamiServerTest {
         server
                 .addHandler(new HttpHeadDecoder())
                 .addHandler(new HttpJsonBodyDecoder())
-                .addHandler(new Decoder() {
+                .addHandler(new Handler() {
                     @Override
-                    public void decode(SocketChannel sc, HandlerContext data) throws IOException {
+                    public void handle(SocketChannel sc, HandlerContext data) throws Exception {
                         HttpContext ctx = (HttpContext) data.data;
                         ctx.retValue = "fuck u 123";
                     }
