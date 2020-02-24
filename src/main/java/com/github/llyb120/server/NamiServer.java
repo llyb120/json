@@ -1,9 +1,7 @@
 package com.github.llyb120.server;
 
 import com.github.llyb120.json.Util;
-import com.github.llyb120.server.decoder.Decoder;
-import com.github.llyb120.server.decoder.DecoderContext;
-import com.github.llyb120.server.decoder.HttpHeadDecoder;
+import com.github.llyb120.server.decoder.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -25,17 +23,19 @@ public class NamiServer {
     private volatile boolean running = true;
     private ExecutorService threadPool;// = Executors.newFixedThreadPool()
     private int port;
-    private Queue<Decoder> decoders = new ConcurrentLinkedQueue<>();
+    private Queue<BaseHandler> decoders = new ConcurrentLinkedQueue<>();
 
     public NamiServer(int port, int maxThread){
         this.port = port;
         this.threadPool = Executors.newFixedThreadPool(maxThread + 1);
     }
 
-    public NamiServer addDecoder(Decoder decoder){
+    public NamiServer addHandler(BaseHandler decoder){
         decoders.add(decoder);
         return this;
     }
+
+//    public NamiServer add
 
     public void start() throws Exception {
         long stime = System.currentTimeMillis();
@@ -110,28 +110,49 @@ public class NamiServer {
             key.cancel();
             SocketChannel sc = (SocketChannel) key.channel();
             threadPool.submit(() -> {
-                try {
-                    handle(sc);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    Util.close(sc);
-                }
+                handle(sc);
             });
         }
     }
 
-    private void handle(SocketChannel sc) throws IOException {
-        sc.configureBlocking(true);
-        sc.setOption(TCP_NODELAY, true);
-        DecoderContext context = new DecoderContext();
-        for (Decoder decoder : decoders) {
-            boolean flag = decoder.decode(sc, context);
-            if(!flag){
-                break;
+    private void handle(SocketChannel sc) {
+        try{
+            sc.configureBlocking(true);
+            sc.setOption(TCP_NODELAY, true);
+            HandlerContext context = new HandlerContext();
+            Exception lastException = null;
+            for (BaseHandler decoder : decoders) {
+                if(lastException == null){
+                   if(decoder instanceof Decoder){
+                       try {
+                           ((Decoder) decoder).decode(sc, context);
+                       } catch (Exception e) {
+                           lastException = e;
+                       }
+                   } else if(decoder instanceof Handler){
+                       try {
+                           ((Handler) decoder).handle(sc, context);
+                       } catch (Exception e) {
+                           lastException = e;
+                       }
+                   }
+                } else if(decoder instanceof ErrorHandler){
+                    try {
+                        ((ErrorHandler) decoder).handle(sc, context, lastException);
+                    } catch (Exception e) {
+                        lastException = e;
+                    }
+                }
             }
+            context.os.flush();
+            if (lastException != null) {
+                throw lastException;
+            }
+        } catch (Exception e){
+          e.printStackTrace();
+        }  finally {
+           Util.close(sc);
         }
-        context.os.flush();
     }
 
 }

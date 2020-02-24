@@ -9,7 +9,7 @@ import java.nio.channels.SocketChannel;
 public class HttpHeadDecoder implements Decoder{
 
     @Override
-    public boolean decode(SocketChannel sc, DecoderContext context) throws IOException {
+    public void decode(SocketChannel sc, HandlerContext context) throws IOException {
         context.is = new BufferedInputStream(Channels.newInputStream(sc));
         context.os = new BufferedOutputStream(Channels.newOutputStream(sc));
         int n = context.is.read(context.buffer);
@@ -47,7 +47,6 @@ public class HttpHeadDecoder implements Decoder{
                 httpContext.requestHeaders.put(lines[i].substring(0, _i), lines[i].substring(_i + 1).trim());
             }
         }
-        return true;
     }
 
 

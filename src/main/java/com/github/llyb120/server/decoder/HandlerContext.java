@@ -9,7 +9,7 @@ import java.io.OutputStream;
 
 import static com.github.llyb120.json.Json.o;
 
-public class DecoderContext {
+public class HandlerContext {
     public InputStream is;
     public OutputStream os;
     public byte[] buffer;
@@ -17,7 +17,7 @@ public class DecoderContext {
     public int limit = -1;
     public Object data;
 
-    public DecoderContext(){
+    public HandlerContext(){
         buffer = BufferPool.get(4096);
     }
 }

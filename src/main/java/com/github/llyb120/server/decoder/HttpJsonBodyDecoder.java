@@ -11,19 +11,19 @@ import java.nio.channels.SocketChannel;
 public class HttpJsonBodyDecoder implements Decoder{
 
     @Override
-    public boolean decode(SocketChannel sc, DecoderContext data) throws IOException {
+    public void decode(SocketChannel sc, HandlerContext data) throws IOException {
         if(!(data.data instanceof HttpContext)){
-            return true;
+            return;
         }
         //获取contentType
         HttpContext httpContext = (HttpContext) data.data;
         if(!httpContext.getRequestContentType().contains("application/json")){
-            return true;
+            return;
         }
 
         int len = httpContext.getRequestContentLength();
         if(len < 1){
-            return true;
+            return;
         }
         if(data.position != -1 && data.position <= data.limit){
             //获取剩余的内容
@@ -32,7 +32,7 @@ public class HttpJsonBodyDecoder implements Decoder{
             System.arraycopy(data.buffer, data.position, buffer, 0, half);
             int n = data.is.read(buffer, half, buffer.length - half);
             if(n < 1){
-                return true;
+                return ;
             }
             String body = new String(buffer, 0, half + n);
             Object post = Json.parse(body);
@@ -41,7 +41,6 @@ public class HttpJsonBodyDecoder implements Decoder{
             } else if(post instanceof Obj)
                 httpContext.mapBody = (Obj) post;
         }
-        return true;
     }
 
 }

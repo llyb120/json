@@ -13,6 +13,9 @@ public class HttpContext {
     public Obj mapBody;
     public Arr arrBody;
 
+    //返回给前端的值
+    public Object retValue;
+
     public enum HttpMethod{
         GET,POST,OPTION,DELETE,HEAD, UNKNOWN;
     }
