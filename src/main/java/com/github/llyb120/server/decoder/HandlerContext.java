@@ -9,7 +9,7 @@ import java.io.OutputStream;
 
 import static com.github.llyb120.json.Json.o;
 
-public class HandlerContext {
+public class HandlerContext implements AutoCloseable{
     public InputStream is;
     public OutputStream os;
     public byte[] buffer;
@@ -19,5 +19,12 @@ public class HandlerContext {
 
     public HandlerContext(){
         buffer = BufferPool.get(4096);
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (buffer != null) {
+            BufferPool.release(buffer);
+        }
     }
 }

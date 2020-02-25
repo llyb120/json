@@ -115,10 +115,11 @@ public class NamiServer {
     }
 
     private void handle(SocketChannel sc) {
+        HandlerContext context = null;
         try {
             sc.configureBlocking(true);
             sc.setOption(TCP_NODELAY, true);
-            HandlerContext context = new HandlerContext();
+            context = new HandlerContext();
             Exception lastException = null;
             for (BaseHandler decoder : decoders) {
                 if (decoder instanceof Decoder) {
@@ -148,6 +149,7 @@ public class NamiServer {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            Util.close(context);
             Util.close(sc);
         }
     }
