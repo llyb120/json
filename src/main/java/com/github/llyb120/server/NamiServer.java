@@ -1,6 +1,7 @@
 package com.github.llyb120.server;
 
 import com.github.llyb120.json.Util;
+import com.github.llyb120.log.Log;
 import com.github.llyb120.server.decoder.*;
 
 import java.io.IOException;
@@ -40,8 +41,6 @@ public class NamiServer {
 //    public NamiServer add
 
     public void start() throws Exception {
-        long stime = System.currentTimeMillis();
-
         //打开多路复用器
         selector = Selector.open();
         //打开服务器通道
@@ -54,7 +53,7 @@ public class NamiServer {
         //把服务器通道注册到多路复用器上，并监听阻塞事件
         servChannel.register(selector, SelectionKey.OP_ACCEPT);
 
-        System.out.printf("boot server on port %d takes %s ms\n\n", port, System.currentTimeMillis() - stime);
+        Log.info(String.format("boot server on port %d", port));
 
         threadPool.submit(() -> {
             loop();
