@@ -39,7 +39,7 @@ public class NamiServerTest {
 //                .execute();
 
 //        Thread.sleep(100000);
-       new CountDownLatch(1).await();
+//       new CountDownLatch(1).await();
     }
 
 }

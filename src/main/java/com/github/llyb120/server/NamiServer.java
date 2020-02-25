@@ -21,13 +21,15 @@ public class NamiServer {
     private Selector selector;
     private ServerSocketChannel servChannel;
     private volatile boolean running = true;
-    private ExecutorService threadPool;// = Executors.newFixedThreadPool()
-    private int port;
+    ExecutorService threadPool;// = Executors.newFixedThreadPool()
+    int port;
     private Queue<BaseHandler> decoders = new ConcurrentLinkedQueue<>();
 
-    public NamiServer(int port, int maxThread) {
-        this.port = port;
-        this.threadPool = Executors.newFixedThreadPool(maxThread + 1);
+    NamiServer() {
+    }
+
+    public static NamiServerBuilder builder(){
+        return new NamiServerBuilder();
     }
 
     public NamiServer addHandler(BaseHandler decoder) {
