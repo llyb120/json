@@ -1,10 +1,12 @@
 package com.github.llyb120.server;
 
+import cn.hutool.http.HttpUtil;
 import com.github.llyb120.server.decoder.*;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.CountDownLatch;
 
 public class NamiServerTest {
     @Test
@@ -13,6 +15,7 @@ public class NamiServerTest {
         server
                 .addHandler(new HttpHeadDecoder())
                 .addHandler(new HttpJsonBodyDecoder())
+                .addHandler(new HttpFormDataBodyDecoder())
                 .addHandler(new Handler() {
                     @Override
                     public void handle(SocketChannel sc, HandlerContext data) throws Exception {
@@ -25,6 +28,8 @@ public class NamiServerTest {
 
 //        Thread.sleep(1000);
 ////        HttpUtil.get("http://127.0.0.1:8099/fuck");
+//        HttpUtil.createPost()
+//                .
 //        HttpUtil.createPost("http://127.0.0.1:8099/fuck")
 //                .header("content-type", "application/json")
 //                .body(o(
@@ -33,6 +38,7 @@ public class NamiServerTest {
 //                .execute();
 
 //        Thread.sleep(100000);
+       new CountDownLatch(1).await();
     }
 
 }

@@ -35,9 +35,15 @@ public class HttpJsonBodyDecoder implements Decoder{
             int n = 0;
             //还有可读的内容
             if(len > data.limit){
-                n = data.is.read(buffer, half, buffer.length - half);
-                if(n < 1){
-                    return ;
+                int left = len - data.limit;
+                n = half;
+                while(left > 0){
+                    int read = data.is.read(buffer, n, 4096);
+                    if(n < 1){
+                        return ;
+                    }
+                    n += read;
+                    left -= read;
                 }
             }
             String body = new String(buffer, 0, half + n);
