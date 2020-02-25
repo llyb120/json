@@ -11,21 +11,21 @@ import java.util.concurrent.CountDownLatch;
 public class NamiServerTest {
     @Test
     public void test() throws Exception {
-        NamiServer server = new NamiServer(8099, 1024);
-        server
-                .addHandler(new HttpHeadDecoder())
-                .addHandler(new HttpJsonBodyDecoder())
-                .addHandler(new HttpFormDataBodyDecoder())
-                .addHandler(new HttpFormUrlencodedDecoder())
-                .addHandler(new Handler() {
-                    @Override
-                    public void handle(SocketChannel sc, HandlerContext data) throws Exception {
-                        HttpContext ctx = (HttpContext) data.data;
-                        ctx.retValue = "fuck u 123";
-                    }
-                })
-                .addHandler(new JsonObjectWriter())
-                .start();
+//        NamiServer server = new NamiServer(8099, 1024);
+//        server
+//                .addHandler(new HttpHeadDecoder())
+//                .addHandler(new HttpJsonBodyDecoder())
+//                .addHandler(new HttpFormDataBodyDecoder())
+//                .addHandler(new HttpFormUrlencodedDecoder())
+//                .addHandler(new Handler() {
+//                    @Override
+//                    public void handle(SocketChannel sc, HandlerContext data) throws Exception {
+//                        HttpContext ctx = (HttpContext) data.data;
+//                        ctx.retValue = "fuck u 123";
+//                    }
+//                })
+//                .addHandler(new JsonObjectWriter())
+//                .start();
 
 //        Thread.sleep(1000);
 ////        HttpUtil.get("http://127.0.0.1:8099/fuck");

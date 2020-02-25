@@ -6,7 +6,9 @@ import com.github.llyb120.json.Obj;
 import com.github.llyb120.server.BufferPool;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 
 public class HttpJsonBodyDecoder implements HttpBodyDecoder {
 
@@ -23,11 +25,11 @@ public class HttpJsonBodyDecoder implements HttpBodyDecoder {
         if (!httpContext.getRequestContentType().contains("application/json")) {
             return;
         }
-        byte[] buffer = readBody(data);
+        ByteBuffer buffer = readBody(sc, data);
         if (buffer == null) {
             return;
         }
-        String body = new String(buffer, 0, data.position);
+        String body = StandardCharsets.UTF_8.decode(buffer).toString();//new String(buffer, 0, data.position);
         Object post = Json.parse(body);
         if (post instanceof Arr) {
             httpContext.arrBody = (Arr) post;

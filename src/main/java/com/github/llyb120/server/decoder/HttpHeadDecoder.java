@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
@@ -13,21 +14,29 @@ public class HttpHeadDecoder implements Decoder{
 
     @Override
     public void decode(SocketChannel sc, HandlerContext context) throws IOException {
-        context.is = new BufferedInputStream(Channels.newInputStream(sc));
-        context.os = new BufferedOutputStream(Channels.newOutputStream(sc));
-        int n = context.is.read(context.buffer);
-        if (n < 0) {
+        ByteBuffer buffer = context.buffer = ByteBuffer.allocateDirect(4096);
+        int n = sc.read(buffer);
+        if(n < 0){
             return;
         }
-        String str = new String(context.buffer, 0, n);
+        buffer.flip();
+        String str = StandardCharsets.ISO_8859_1.decode(buffer).toString();//buffer.asCharBuffer().toString();
+//        context.is = new BufferedInputStream(Channels.newInputStream(sc));
+//        context.os = new BufferedOutputStream(Channels.newOutputStream(sc));
+//        int n = context.is.read(context.buffer);
+//        if (n < 0) {
+//            return;
+//        }
+//        String str = new String(context.buffer, 0, n);
         int pos = str.indexOf("\r\n\r\n");
         if(pos == -1){
             return;
         }
         pos += 4;
+        buffer.position(pos);
         str = str.substring(0, pos);
-        context.position = pos;
-        context.limit = n;
+//        context.position = pos;
+//        context.limit = n;
         String[] lines = str.split("\r\n");
         if(lines.length == 0){
             return;

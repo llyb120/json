@@ -2,6 +2,8 @@ package com.github.llyb120.server.decoder;
 
 import com.github.llyb120.json.Json;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -20,8 +22,9 @@ public class JsonObjectWriter implements Decoder{
             return;
         }
 
-        data.os.write(OK);
-        data.os.write(LINE);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(OK);
+        baos.write(LINE);
         byte[] bs = null;//new byte[0];
         if(httpContext.retValue instanceof String){
             bs = ((String) httpContext.retValue).getBytes(StandardCharsets.UTF_8);
@@ -33,11 +36,14 @@ public class JsonObjectWriter implements Decoder{
         httpContext.responseHeaders.put("Content-Length", bs.length);
         httpContext.responseHeaders.put("Content-Type", "application/json; charset=utf-8");
         for (Map.Entry<String, Object> entry : httpContext.responseHeaders.entrySet()) {
-            data.os.write((entry.getKey() + ": " + entry.getValue()).getBytes());
-            data.os.write(LINE);
+            baos.write((entry.getKey() + ": " + entry.getValue()).getBytes());
+            baos.write(LINE);
         }
-        data.os.write(LINE);
-        data.os.write(bs);
+        baos.write(LINE);
+        baos.write(bs);
+
+        ByteBuffer buffer = ByteBuffer.wrap(baos.toByteArray());
+        sc.write(buffer);
     }
 
 }

@@ -2,6 +2,7 @@ package com.github.llyb120.server.decoder;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
@@ -22,11 +23,11 @@ public class HttpFormUrlencodedDecoder implements HttpBodyDecoder{
         if(!contentType.contains("application/x-www-form-urlencoded")){
             return;
         }
-        byte[] buffer = readBody(data);
+        ByteBuffer buffer = readBody(sc, data);
         if (buffer == null) {
             return;
         }
-        String query = new String(buffer, 0, data.position);
+        String query = StandardCharsets.UTF_8.decode(buffer).toString();//new String(buffer, 0, data.position);
         try{
             query = URLDecoder.decode(query, StandardCharsets.UTF_8.name());
             query = URLDecoder.decode(query, StandardCharsets.UTF_8.name());

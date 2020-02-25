@@ -144,7 +144,7 @@ public class NamiServer {
                     }
                 }
             }
-            context.os.flush();
+//            context.os.flush();
             if (lastException != null) {
                 throw lastException;
             }
