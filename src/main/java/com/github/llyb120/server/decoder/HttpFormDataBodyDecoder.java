@@ -1,20 +1,13 @@
 package com.github.llyb120.server.decoder;
 
-import com.github.llyb120.json.Arr;
-import com.github.llyb120.json.Json;
-import com.github.llyb120.json.Obj;
-import com.github.llyb120.server.BufferPool;
 import com.github.llyb120.server.request.FormDataFile;
-import sun.reflect.misc.FieldUtil;
 
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
 import static com.github.llyb120.json.Json.o;
 
-public class HttpFormDataBodyDecoder implements Decoder{
+public class HttpFormDataBodyDecoder implements HttpBodyDecoder {
     @Override
     public void decode(SocketChannel sc, HandlerContext data) throws Exception {
         if(!(data.data instanceof HttpContext)){
@@ -33,30 +26,11 @@ public class HttpFormDataBodyDecoder implements Decoder{
             return;
         }
         String token = contentType.substring(i + "boundary=".length());
-        int len = context.getRequestContentLength();
-        if(len < 1){
+        byte[] buffer = readBody(data);
+        if (buffer == null) {
             return;
         }
-        if(data.position != -1 && data.position <= data.limit ){
-            //获取剩余的内容
-            byte[] buffer = BufferPool.get((len / 4096 + 1) * 4096);
-            int half = data.limit - data.position;
-            System.arraycopy(data.buffer, data.position, buffer, 0, half);
-            int n = 0;
-            //还有可读的内容
-            if(len > data.limit){
-                int left = len - data.limit;
-                n = half;
-                while(left > 0){
-                    int read = data.is.read(buffer, n, 4096);
-                    if(n < 1){
-                        return ;
-                    }
-                    n += read;
-                    left -= read;
-                }
-            }
-            String body = new String(buffer, 0, len, StandardCharsets.ISO_8859_1);//"ISO-8859-1");
+            String body = new String(buffer, 0, data.position, StandardCharsets.ISO_8859_1);//"ISO-8859-1");
             String[] arr = body.split("\r\n--" + token);
             boolean first = true;
             if(arr.length == 0){
@@ -120,7 +94,6 @@ public class HttpFormDataBodyDecoder implements Decoder{
 //            } else if(post instanceof Obj)
 //                httpContext.mapBody = (Obj) post;
 //            int d = 2;
-        }
 
     }
 

@@ -16,6 +16,7 @@ public class NamiServerTest {
                 .addHandler(new HttpHeadDecoder())
                 .addHandler(new HttpJsonBodyDecoder())
                 .addHandler(new HttpFormDataBodyDecoder())
+                .addHandler(new HttpFormUrlencodedDecoder())
                 .addHandler(new Handler() {
                     @Override
                     public void handle(SocketChannel sc, HandlerContext data) throws Exception {
