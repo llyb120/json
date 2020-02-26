@@ -1,30 +1,33 @@
-package com.github.llyb120.server.decoder;
+package com.github.llyb120.server.writer;
 
 import com.github.llyb120.json.Json;
+import com.github.llyb120.server.decoder.Decoder;
+import com.github.llyb120.server.decoder.HandlerContext;
+import com.github.llyb120.server.decoder.HttpContext;
+import com.github.llyb120.server.request.FormDataFile;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class JsonObjectWriter implements Decoder{
+public class JsonObjectWriter implements HttpWriter {
 
-    static byte[] OK = "HTTP/1.1 200 OK".getBytes();
-    static byte[] LINE = "\r\n".getBytes();
     @Override
-    public void decode(SocketChannel sc, HandlerContext data) throws Exception {
+    public void handle(SocketChannel sc, HandlerContext data) throws Exception {
         if(!(data.data instanceof HttpContext)){
             return;
         }
         HttpContext httpContext = (HttpContext) data.data;
-        if(httpContext.retValue == null){
+        if(httpContext.responseStatus != -1){
             return;
         }
-
+        if(httpContext.retValue instanceof File || httpContext.retValue instanceof FormDataFile){
+            return;
+        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(OK);
-        baos.write(LINE);
         byte[] bs = null;//new byte[0];
         if(httpContext.retValue instanceof String){
             bs = ((String) httpContext.retValue).getBytes(StandardCharsets.UTF_8);
@@ -33,17 +36,10 @@ public class JsonObjectWriter implements Decoder{
         } else {
             bs = Json.stringify(httpContext.retValue).getBytes(StandardCharsets.UTF_8);
         }
+        httpContext.responseStatus = 200;
         httpContext.responseHeaders.put("Content-Length", bs.length);
         httpContext.responseHeaders.put("Content-Type", "application/json; charset=utf-8");
-        for (Map.Entry<String, Object> entry : httpContext.responseHeaders.entrySet()) {
-            baos.write((entry.getKey() + ": " + entry.getValue()).getBytes());
-            baos.write(LINE);
-        }
-        baos.write(LINE);
-        baos.write(bs);
-
-        ByteBuffer buffer = ByteBuffer.wrap(baos.toByteArray());
-        sc.write(buffer);
+        write(sc, getHeaders(httpContext), bs);
     }
 
 }

@@ -3,9 +3,11 @@ package com.github.llyb120;
 import com.github.llyb120.server.NamiServer;
 import com.github.llyb120.server.decoder.*;
 import com.github.llyb120.server.request.FormDataFile;
+import com.github.llyb120.server.writer.HttpFileWriter;
+import com.github.llyb120.server.writer.JsonObjectWriter;
 
+import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 public class TestServerApp {
@@ -31,10 +33,11 @@ public class TestServerApp {
                                 fos.close();
                             }
                         }
-                        ctx.retValue = "fuck u 123";
+                        ctx.retValue = new File("d:/日狗.fuck");//"fuck u 123";
                     }
                 })
                 .addHandler(new JsonObjectWriter())
+                .addHandler(new HttpFileWriter())
                 .start();
     }
 }
