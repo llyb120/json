@@ -1,21 +1,13 @@
 package com.github.llyb120.server.writer;
 
-import com.github.llyb120.server.decoder.Decoder;
-import com.github.llyb120.server.decoder.Handler;
-import com.github.llyb120.server.decoder.HandlerContext;
-import com.github.llyb120.server.decoder.HttpContext;
+import com.github.llyb120.server.handler.HandlerContext;
+import com.github.llyb120.server.http.HttpContext;
 import com.github.llyb120.server.request.FormDataFile;
-import com.sun.corba.se.spi.ior.IdentifiableFactory;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class HttpFileWriter implements HttpWriter {
 

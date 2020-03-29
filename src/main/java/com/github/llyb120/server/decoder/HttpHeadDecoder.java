@@ -1,12 +1,12 @@
 package com.github.llyb120.server.decoder;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import com.github.llyb120.server.handler.HandlerContext;
+import com.github.llyb120.server.http.HttpContext;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
@@ -21,13 +21,6 @@ public class HttpHeadDecoder implements Decoder{
         }
         buffer.flip();
         String str = StandardCharsets.ISO_8859_1.decode(buffer).toString();//buffer.asCharBuffer().toString();
-//        context.is = new BufferedInputStream(Channels.newInputStream(sc));
-//        context.os = new BufferedOutputStream(Channels.newOutputStream(sc));
-//        int n = context.is.read(context.buffer);
-//        if (n < 0) {
-//            return;
-//        }
-//        String str = new String(context.buffer, 0, n);
         int pos = str.indexOf("\r\n\r\n");
         if(pos == -1){
             return;
@@ -61,7 +54,7 @@ public class HttpHeadDecoder implements Decoder{
         }
     }
 
-    private void handlePath(HttpContext context){
+    public void handlePath(HttpContext context){
         int i = context.path.indexOf("?");
         if (i == -1) {
             return;

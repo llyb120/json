@@ -1,6 +1,7 @@
 package com.github.llyb120.server.decoder;
 
-import com.github.llyb120.server.BufferPool;
+import com.github.llyb120.server.handler.HandlerContext;
+import com.github.llyb120.server.http.HttpContext;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

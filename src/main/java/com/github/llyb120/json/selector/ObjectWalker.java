@@ -5,11 +5,11 @@ import com.github.llyb120.json.reflect.ReflectUtil;
 import java.util.*;
 
 public class ObjectWalker {
-    public LinkedList<Map.Entry> path;
-    public List<LinkedList<Map.Entry>> result;
+    public List<Map.Entry> path;
+    public List<List<Map.Entry>> result;
 
     public ObjectWalker walk(Object object) {
-        path = new LinkedList<>();
+        path = new ArrayList<>();
         result = new ArrayList();
         _walk(object);
         return this;
@@ -19,7 +19,7 @@ public class ObjectWalker {
         Map<String, Object> props = ReflectUtil.getValues(object);
         //如果没有下一个了
 //        if (props.isEmpty()) {
-            result.add(new LinkedList<>(path));
+            result.add(new ArrayList<>(path));
 //            return;
 //        }
         for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -27,9 +27,11 @@ public class ObjectWalker {
             if(path.stream().anyMatch(e -> e.getValue() == entry.getValue())){
                 continue;
             }
-            path.addLast(entry);
+            path.add(entry);
+//            path.addLast(entry);
             _walk(entry.getValue());
-            path.removeLast();
+            path.remove(path.size() - 1);
+//            path.removeLast();
         }
     }
 }

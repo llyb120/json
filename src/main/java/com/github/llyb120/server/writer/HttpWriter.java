@@ -1,13 +1,11 @@
 package com.github.llyb120.server.writer;
 
-import com.github.llyb120.server.decoder.Handler;
-import com.github.llyb120.server.decoder.HttpContext;
+import com.github.llyb120.server.handler.Handler;
+import com.github.llyb120.server.http.HttpContext;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public interface HttpWriter extends Handler {

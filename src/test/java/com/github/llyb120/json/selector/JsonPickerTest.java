@@ -1,5 +1,7 @@
 package com.github.llyb120.json.selector;
 
+import com.github.llyb120.json.Arr;
+import com.github.llyb120.json.Json;
 import com.github.llyb120.json.Obj;
 import org.junit.Test;
 
@@ -43,5 +45,13 @@ public class JsonPickerTest {
 
         List<String> items = JsonPicker.pick("array foo[key1]+foo[key3]", item, String.class);
         int d = 2;
+    }
+
+    @Test
+    public void pick2(){
+        String str = "{\"_id\":\"5e5cbd00a2ce611b47c081de\",\"id\":\"1\",\"username\":\"admin\",\"password\":\"2\",\"su\":1,\"true_name\":\"系统管理员\",\"phone\":\"15094011010\",\"orgs\":[{\"id\":\"1126767593877667840\",\"type\":\"ROLE\"},{\"id\":\"2000007\",\"type\":\"ROLE\"},{\"id\":\"1185103421875818496\",\"type\":\"ROLE\"},{\"id\":\"1059767604954005504\",\"type\":\"ROLE\"},{\"id\":\"222\",\"type\":\"DEP\"}]}";
+        Obj obj = Json.parse(str);
+        Arr<String> item = obj.pick("orgs [type=DEP] id", String.class);
+        System.out.println("fff");
     }
 }

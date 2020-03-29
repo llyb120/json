@@ -1,5 +1,7 @@
 package com.github.llyb120.server.decoder;
 
+import com.github.llyb120.server.handler.HandlerContext;
+import com.github.llyb120.server.http.HttpContext;
 import com.github.llyb120.server.request.FormDataFile;
 
 import java.nio.ByteBuffer;

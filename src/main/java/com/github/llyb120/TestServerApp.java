@@ -2,6 +2,10 @@ package com.github.llyb120;
 
 import com.github.llyb120.server.NamiServer;
 import com.github.llyb120.server.decoder.*;
+import com.github.llyb120.server.handler.Handler;
+import com.github.llyb120.server.handler.HandlerContext;
+import com.github.llyb120.server.http.HttpContext;
+import com.github.llyb120.server.http.HttpProxyHandler;
 import com.github.llyb120.server.request.FormDataFile;
 import com.github.llyb120.server.writer.HttpFileWriter;
 import com.github.llyb120.server.writer.JsonObjectWriter;
@@ -17,6 +21,7 @@ public class TestServerApp {
                 .maxThreads(1024)
                 .build()
                 .addHandler(new HttpHeadDecoder())
+                .addHandler(new HttpProxyHandler("/hz", "http://47.94.97.138"))
                 .addHandler(new HttpJsonBodyDecoder())
                 .addHandler(new HttpFormDataBodyDecoder())
                 .addHandler(new HttpFormUrlencodedDecoder())

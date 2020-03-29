@@ -3,9 +3,15 @@ package com.github.llyb120.server;
 import com.github.llyb120.json.Util;
 import com.github.llyb120.log.Log;
 import com.github.llyb120.server.decoder.*;
+import com.github.llyb120.server.handler.BaseHandler;
+import com.github.llyb120.server.handler.ErrorHandler;
+import com.github.llyb120.server.handler.Handler;
+import com.github.llyb120.server.handler.HandlerContext;
+import com.github.llyb120.server.nio.NioReader;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -104,32 +110,54 @@ public class NamiServer {
             //设置为非阻塞模式
             sc.configureBlocking(false);
             //注册到多路复用器上，并设置为可读状态
-            sc.register(selector, SelectionKey.OP_READ);
+            NioReader.runTask(sc);
+//            sc.register(selector, SelectionKey.OP_READ);
         } else if (key.isReadable()) {
             //读取数据
-            key.cancel();
+//            key.cancel();
             SocketChannel sc = (SocketChannel) key.channel();
-            threadPool.submit(() -> {
-                handle(sc);
-            });
+//            threadPool.submit(() -> {
+                ByteBuffer buf = ByteBuffer.allocate(10);
+                try {
+                    int n;
+                        n = sc.read(buf);
+                        System.out.println(n);
+                    if(n < 0){
+                        key.cancel();
+                        System.out.println("cancel");
+                    }
+//                    key.cancel();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(new String(buf.array()));
+                System.out.println("read ！");
+//                handle(sc);
+//            });
         }
     }
 
     private void handle(SocketChannel sc) {
         HandlerContext context = null;
         try {
-            sc.configureBlocking(true);
+//            sc.configureBlocking(true);
             sc.setOption(TCP_NODELAY, true);
             context = new HandlerContext();
             Exception lastException = null;
             for (BaseHandler decoder : decoders) {
                 if (decoder instanceof Decoder) {
+                    if(context.finished){
+                        continue;
+                    }
                     try {
                         ((Decoder) decoder).decode(sc, context);
                     } catch (Exception e) {
                         lastException = e;
                     }
                 } else if (decoder instanceof Handler) {
+                    if(context.finished){
+                        continue;
+                    }
                     try {
                         ((Handler) decoder).handle(sc, context);
                     } catch (Exception e) {

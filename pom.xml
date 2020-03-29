@@ -6,7 +6,7 @@
 
     <groupId>com.github.llyb120</groupId>
     <artifactId>json</artifactId>
-    <version>1.1.6</version>
+    <version>1.1.8</version>
     <build>
         <plugins>
             <plugin>

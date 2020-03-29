@@ -50,7 +50,12 @@ public final class SelectorParser extends AbstractSelectorParser{
                 addKey(node);
                 continue;
             } else if(ch == '['){
-                addKey(node);
+                boolean success = addKey(node);
+                if(!success){
+                   //默认为*
+                    SelectorKey _key = new SelectorKey("*");
+                    node.keys.addLast(_key);
+                }
                 readProperty(node);
                 continue;
             } else if(ch == '+'){
@@ -127,11 +132,13 @@ public final class SelectorParser extends AbstractSelectorParser{
         return "";
     }
 
-    private void addKey(SelectorNode node){
+    private boolean addKey(SelectorNode node){
         if(sb.length() > 0){
             SelectorKey key = new SelectorKey(getToken());
             node.keys.add(key);
+            return true;
         }
+        return false;
     }
 
 }

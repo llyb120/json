@@ -331,13 +331,17 @@ public final class Json {
     }
 
     public static Arr toTree(Collection<? extends Map> list, String parentKey, String childKey) {
-        Map map = new HashMap();
+        return toTree(list,parentKey,childKey,null);
+    }
+
+    public static Arr toTree(Collection<? extends Map> list, String parentKey, String childKey, String sortKey) {
+        Map<String, Obj> map = new HashMap();
         for (Map map1 : list) {
             Object key = map1.get(childKey);
             if (key == null) {
                 continue;
             }
-            map.put(key, map1);
+            map.put((String) key, o(map));
         }
         Arr ret = a();
         for (Map map1 : list) {
@@ -346,16 +350,17 @@ public final class Json {
                 ret.add(map1);
                 continue;
             }
-            Map par = (Map) map.get(key);
+            Obj par = map.get(key);
             if (par == null) {
                 continue;
             }
-            List<Map> child = (List<Map>) par.get("children");
-            if (child == null) {
-                child = new ArrayList<>();
-                par.put("children", child);
-            }
+            Arr<? super Object> child = par.aa("children");
             child.add(map1);
+        }
+        if (sortKey != null) {
+            for (Obj value : map.values()) {
+                Collections.sort(value.aa("children"), (a,b) -> Integer.compare(((Obj)a).ii(sortKey), ((Obj)b).ii("sort")));
+            }
         }
 //        for (Json json : list) {
 //            Json par = map.o(json.s(parentKey));

@@ -1,17 +1,14 @@
 package com.github.llyb120.server.writer;
 
 import com.github.llyb120.json.Json;
-import com.github.llyb120.server.decoder.Decoder;
-import com.github.llyb120.server.decoder.HandlerContext;
-import com.github.llyb120.server.decoder.HttpContext;
+import com.github.llyb120.server.handler.HandlerContext;
+import com.github.llyb120.server.http.HttpContext;
 import com.github.llyb120.server.request.FormDataFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 public class JsonObjectWriter implements HttpWriter {
 

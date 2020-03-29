@@ -1,4 +1,4 @@
-package com.github.llyb120.server.decoder;
+package com.github.llyb120.server.handler;
 
 import com.github.llyb120.json.Arr;
 import com.github.llyb120.json.Obj;
@@ -18,6 +18,7 @@ public class HandlerContext implements AutoCloseable{
 //    public int position = -1;
 //    public int limit = -1;
     public Object data;
+    public boolean finished = false;
 
     public HandlerContext(){
 //        buffer = BufferPool.get(4096);

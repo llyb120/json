@@ -42,21 +42,31 @@ public final class JsonPicker {
 
     public static <T> Arr<T> pick(String selector, Object source, Class<T> resultClz) {
         List<SelectorNode> parsed = new SelectorParser(selector).parse();
-        List<LinkedList<Map.Entry>> values = new ObjectWalker().walk(source).result;
+        List<List<Map.Entry>> values = new ObjectWalker().walk(source).result;
         Arr<T> result = a();
         Map cache = new HashMap();
-        for (LinkedList<Map.Entry> entries : values) {
+        for (List<Map.Entry> entries : values) {
             check:
             for (SelectorNode selectorNode : parsed) {
                 SelectorNode node = selectorNode;
                 //命中任意
-                Iterator<Map.Entry> it = entries.descendingIterator();
+                //倒序检查
+                int i = entries.size();
                 Map.Entry matched = null;
-                while (it.hasNext()) {
-                    Map.Entry next = it.next();
+                while(i-- > 0){
+                    Map.Entry next = entries.get(i);//it.next();
                     //key满足
+                    int finalI = i;
                     if (node.keys.stream().anyMatch(e -> {
-                        return checkKey(e, next.getKey()) && checkValue(e, next.getValue());
+                        boolean validKey = checkKey(e, next.getKey());
+                        //如果前面的是一个数组，那么也满足
+                        if(!validKey){
+                            if(finalI - 1 >= 0){
+                                Map.Entry prev = entries.get(finalI - 1);
+                                validKey = (prev.getValue() instanceof Collection && checkKey(e, prev.getKey()));
+                            }
+                        }
+                        return validKey && checkValue(e, next.getValue());
                     })) {
                         if (matched == null) {
                             matched = next;
