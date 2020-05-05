@@ -341,10 +341,10 @@ public final class Json {
             if (key == null) {
                 continue;
             }
-            map.put((String) key, o(map));
+            map.put((String) key, o(map1));
         }
         Arr ret = a();
-        for (Map map1 : list) {
+        for (Obj map1 : map.values()) {
             Object key = map1.get(parentKey);
             if (key == null) {
                 ret.add(map1);
@@ -355,12 +355,13 @@ public final class Json {
                 continue;
             }
             Arr<? super Object> child = par.aa("children");
-            child.add(map1);
+            child.add(map.get(map1.get(childKey)));
         }
         if (sortKey != null) {
             for (Obj value : map.values()) {
                 Collections.sort(value.aa("children"), (a,b) -> Integer.compare(((Obj)a).ii(sortKey), ((Obj)b).ii("sort")));
             }
+            Collections.sort(ret, (a,b) -> Integer.compare(((Obj)a).ii(sortKey), ((Obj)b).ii("sort")));
         }
 //        for (Json json : list) {
 //            Json par = map.o(json.s(parentKey));
