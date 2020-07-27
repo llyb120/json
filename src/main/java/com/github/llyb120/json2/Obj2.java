@@ -17,11 +17,11 @@ public class Obj2 {
     //提前量
     private String prefix = "";
 
-    Obj2(Map map){
+    Obj2(Map map) {
         this.map = map;
     }
 
-    enum PathType{
+    enum PathType {
         //直接取值
         DIRECT,
         //正则
@@ -36,10 +36,10 @@ public class Obj2 {
      * @param path
      * @return 路径的类型
      */
-    PathType getPathType(String path){
-        if(path.charAt(0) == '/'){
+    PathType getPathType(String path) {
+        if (path.charAt(0) == '/') {
             return PathType.REGEX;
-        } else if(path.contains("*")){
+        } else if (path.contains("*")) {
             return PathType.SIMPLE_REGEX;
         } else {
             return PathType.DIRECT;
@@ -49,35 +49,42 @@ public class Obj2 {
     /**
      * 字符串相关
      */
-    public String s(String path){
+    public String s(String path) {
         return getString(path);
     }
 
-    public String s(String path, String dft){
+    public String s(String path, String dft) {
         return getString(path, dft);
     }
-    public String ss(String path){
+
+    public String ss(String path) {
         return getFixedString(path);
     }
-    public String ss(String path, String dft){
+
+    public String ss(String path, String dft) {
         return getFixedString(path, dft);
     }
-    public String sl(String path){
+
+    public String sl(String path) {
         return "";
     }
-    public String getString(String path){
+
+    public String getString(String path) {
         return getString(path, "");
     }
-    public String getString(String path, String dft){
+
+    public String getString(String path, String dft) {
         return cast(get(path, dft), String.class);
     }
-    public String getFixedString(String path){
+
+    public String getFixedString(String path) {
         return getFixedString(path, "");
     }
-    public String getFixedString(String path, String dft){
+
+    public String getFixedString(String path, String dft) {
         String str = getString(path, dft);
         PathType type = getPathType(path);
-        if(type == PathType.DIRECT){
+        if (type == PathType.DIRECT) {
             set(path, str);
         }
         return str;
@@ -88,18 +95,18 @@ public class Obj2 {
      * 通用取
      *
      * @param path 路径
-     * @param dft 默认值
+     * @param dft  默认值
      * @return
      */
-    public Object get(String path, Object dft){
+    public Object get(String path, Object dft) {
         path = handlePrefix(path);
         PathType type = getPathType(path);
         String reg;
-        switch (type){
+        switch (type) {
             case DIRECT:
                 //直接取值
                 for (String s : map.keySet()) {
-                    if(s.equalsIgnoreCase(path)){
+                    if (s.equalsIgnoreCase(path)) {
                         return map.get(s);
                     }
                 }
@@ -109,7 +116,7 @@ public class Obj2 {
                 //通配符
                 reg = simpleRegToReg(path);//path.replaceAll("\\*", ".+");
                 for (String s : map.keySet()) {
-                    if(s.matches(reg)){
+                    if (s.matches(reg)) {
                         return map.get(s);
                     }
                 }
@@ -119,7 +126,7 @@ public class Obj2 {
                 //正则表达式
                 reg = path.substring(1);
                 for (String s : map.keySet()) {
-                    if(s.matches(reg)){
+                    if (s.matches(reg)) {
                         return map.get(s);
                     }
                 }
@@ -128,45 +135,46 @@ public class Obj2 {
         }
         return dft;
     }
-    public Object get(String path){
+
+    public Object get(String path) {
         return get(path, null);
     }
 
-    public Obj2 set(String path, Object value){
+    public Obj2 set(String path, Object value) {
         path = handlePrefix(path);
         PathType type = getPathType(path);
-        if(type != PathType.DIRECT){
+        if (type != PathType.DIRECT) {
             throw new ErrorPathException(path);
         }
         map.put(path, value);
         return this;
     }
 
-    String handlePrefix(String path){
-        if("".equals(prefix)){
+    String handlePrefix(String path) {
+        if ("".equals(prefix)) {
             return path;
         }
         PathType prefixType = getPathType(prefix);
         PathType pathType = getPathType(path);
-        if(prefixType == PathType.REGEX ) {
-            if(pathType == PathType.REGEX){
+        if (prefixType == PathType.REGEX) {
+            if (pathType == PathType.REGEX) {
                 return prefix + path.substring(1);
             } else {
                 //两个都要处理成正则
-                if(pathType == PathType.SIMPLE_REGEX){
+                if (pathType == PathType.SIMPLE_REGEX) {
                     return prefix + simpleRegToReg(path);
                 } else {
                     return prefix + directToReg(path);
                 }
             }
-        } else if(prefixType == PathType.SIMPLE_REGEX){
-            if(pathType == PathType.REGEX){
+        } else if (prefixType == PathType.SIMPLE_REGEX) {
+            if (pathType == PathType.REGEX) {
                 return "/" + simpleRegToReg(prefix) + path.substring(1);
             } else {
                 return prefix + path;
             }
         } else {
-            if(pathType == PathType.REGEX) {
+            if (pathType == PathType.REGEX) {
                 return "/" + directToReg(prefix) + path.substring(1);
             } else {
                 return prefix + path;
@@ -180,9 +188,9 @@ public class Obj2 {
      * @param simpleReg
      * @return
      */
-    String simpleRegToReg(String simpleReg){
+    String simpleRegToReg(String simpleReg) {
         return directToReg(simpleReg)
-            .replaceAll("\\*", "\\\\.");
+            .replaceAll("\\*", ".+");
     }
 
     /**
@@ -191,9 +199,9 @@ public class Obj2 {
      * @param direct
      * @return
      */
-    String directToReg(String direct){
+    String directToReg(String direct) {
         return direct
-            .replaceAll("\\*", ".+");
+            .replaceAll("\\.", "\\\\.");
     }
 
     /**
@@ -201,7 +209,7 @@ public class Obj2 {
      *
      * @return
      */
-    public Obj2 prefix(String prefix){
+    public Obj2 prefix(String prefix) {
         this.prefix = prefix;
         return this;
     }
@@ -211,11 +219,10 @@ public class Obj2 {
      *
      * @return
      */
-    public Obj2 prefix(){
+    public Obj2 prefix() {
         this.prefix = "";
         return this;
     }
-
 
 
     @Override
