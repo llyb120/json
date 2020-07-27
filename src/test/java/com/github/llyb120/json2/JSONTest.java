@@ -23,8 +23,11 @@ public class JSONTest {
         assertEquals(foo, "test");
         foo = obj.s("foo.bar");
         assertEquals(foo, "test");
-
+        //正则取值
+        foo = obj.s("/foo.+ar");
+        assertEquals(foo, "test");
         obj.set("foo.bar", "test2");
+        //通配符取值
         foo = obj.s("*.bar");
         assertEquals(foo, "test2");
         try{
@@ -32,11 +35,10 @@ public class JSONTest {
         } catch (Exception e){
             assertNotNull(e);
         }
-
         for (int i = 0; i < 10; i++) {
             obj.set(String.format("ri.ding.%d.fkfk", i), i);
         }
-//        obj.ss("*.fkfk")
+        assertEquals(obj.s("ri.ding.0.fkfk"), "0");
         System.out.println(
             obj.toString()
         );
