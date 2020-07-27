@@ -1,6 +1,7 @@
 package com.github.llyb120.json2;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public class Obj2 {
     Map<String, Object> map;
 
     //提前量
-    private String prefix = "";
+    private LinkedList<String> prefixes = new LinkedList<>();
 
     Obj2(Map map) {
         this.map = map;
@@ -151,35 +152,42 @@ public class Obj2 {
     }
 
     String handlePrefix(String path) {
-        if ("".equals(prefix)) {
+        if(path.charAt(0) == '/'){
             return path;
         }
-        PathType prefixType = getPathType(prefix);
-        PathType pathType = getPathType(path);
-        if (prefixType == PathType.REGEX) {
-            if (pathType == PathType.REGEX) {
-                return prefix + path.substring(1);
-            } else {
-                //两个都要处理成正则
-                if (pathType == PathType.SIMPLE_REGEX) {
-                    return prefix + simpleRegToReg(path);
-                } else {
-                    return prefix + directToReg(path);
-                }
-            }
-        } else if (prefixType == PathType.SIMPLE_REGEX) {
-            if (pathType == PathType.REGEX) {
-                return "/" + simpleRegToReg(prefix) + path.substring(1);
-            } else {
-                return prefix + path;
-            }
-        } else {
-            if (pathType == PathType.REGEX) {
-                return "/" + directToReg(prefix) + path.substring(1);
-            } else {
-                return prefix + path;
-            }
+        if(prefixes.isEmpty()){
+            return path;
         }
+        return String.join(".", prefixes) + "." + path;
+//        if ("".equals(prefix)) {
+//            return path;
+//        }
+//        PathType prefixType = getPathType(prefix);
+//        PathType pathType = getPathType(path);
+//        if (prefixType == PathType.REGEX) {
+//            if (pathType == PathType.REGEX) {
+//                return prefix + path.substring(1);
+//            } else {
+//                //两个都要处理成正则
+//                if (pathType == PathType.SIMPLE_REGEX) {
+//                    return prefix + simpleRegToReg(path);
+//                } else {
+//                    return prefix + directToReg(path);
+//                }
+//            }
+//        } else if (prefixType == PathType.SIMPLE_REGEX) {
+//            if (pathType == PathType.REGEX) {
+//                return "/" + simpleRegToReg(prefix) + path.substring(1);
+//            } else {
+//                return prefix + path;
+//            }
+//        } else {
+//            if (pathType == PathType.REGEX) {
+//                return "/" + directToReg(prefix) + path.substring(1);
+//            } else {
+//                return prefix + path;
+//            }
+//        }
     }
 
     /**
@@ -209,8 +217,8 @@ public class Obj2 {
      *
      * @return
      */
-    public Obj2 prefix(String prefix) {
-        this.prefix = prefix;
+    public Obj2 enter(String prefix) {
+        this.prefixes.addLast(prefix);
         return this;
     }
 
@@ -219,8 +227,15 @@ public class Obj2 {
      *
      * @return
      */
-    public Obj2 prefix() {
-        this.prefix = "";
+    public Obj2 exit() {
+        if(!this.prefixes.isEmpty()){
+            this.prefixes.removeLast();
+        }
+        return this;
+    }
+
+    public Obj2 clearPath(){
+        this.prefixes.clear();
         return this;
     }
 

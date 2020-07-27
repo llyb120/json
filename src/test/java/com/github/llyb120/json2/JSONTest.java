@@ -33,20 +33,18 @@ public class JSONTest {
         //prefix
         foo = obj.s("bar");
             assertEquals(foo, "");
-            foo = obj.prefix("foo.").s("bar");
+            foo = obj.enter("foo").s("bar");
             assertEquals(foo, "test2");
-            foo = obj.prefix("fo*.").s("bar");
-        assertEquals(foo, "test2");
-        foo = obj.prefix("/fo.+").s("bar");
+            foo = obj.clearPath().enter("fo*").s("bar");
         assertEquals(foo, "test2");
         try{
             obj.set("*.bar", "test3");
         } catch (Exception e){
             assertNotNull(e);
         }
-        obj.prefix("foo.");
+        obj.clearPath().enter("foo");
         obj.set("bar", "test4");
-        obj.prefix();
+        obj.clearPath();
         for (int i = 0; i < 10; i++) {
             obj.set(String.format("ri.ding.%d.fkfk", i), i);
         }
