@@ -34,14 +34,14 @@ public class Util {
         if (null == obj) {
             return true;
         } else {
-            return obj instanceof CharSequence ? isBlank((CharSequence)obj) : false;
+            return obj instanceof CharSequence ? isBlank((CharSequence) obj) : false;
         }
     }
 
     public static boolean isBlank(CharSequence str) {
         int length;
         if (str != null && (length = str.length()) != 0) {
-            for(int i = 0; i < length; ++i) {
+            for (int i = 0; i < length; ++i) {
                 if (!isBlankChar(str.charAt(i))) {
                     return false;
                 }
@@ -86,13 +86,22 @@ public class Util {
         }
     }
 
-    public static void closeIfPossible(Object object){
-        if(object instanceof Closeable){
+    public static void closeIfPossible(Object object) {
+        if (object instanceof Closeable) {
             close((Closeable) object);
-        }
-        else if(object instanceof AutoCloseable){
+        } else if (object instanceof AutoCloseable) {
             close((AutoCloseable) object);
         }
+    }
+
+
+    public static boolean isNumeric(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

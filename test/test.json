@@ -1,0 +1,105 @@
+{
+  "data": [
+    {
+      "_id": "5e994898e83b9e04afe70215",
+      "name": "测试专用",
+      "pid": null,
+      "type": "1",
+      "children": [
+        {
+          "_id": "5f16adafb9f479e8e7bb1e45",
+          "id": "5ef1ae0bc01bc466e0d0deab",
+          "steps": [
+            {
+              "title": "开始",
+              "desc": "我只是一个开始"
+            },
+            {
+              "title": "45",
+              "desc": "没有描述"
+            },
+            {
+              "title": "5",
+              "desc": "没有描述"
+            },
+            {
+              "title": "结束",
+              "desc": "我只是一个结束"
+            }
+          ],
+          "fields": [
+            {
+              "source": "测试文本框",
+              "label": "测试文本框",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "测试多行文本",
+              "label": "测试多行文本",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "测试下拉菜单",
+              "label": "测试下拉菜单",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "测试单选",
+              "label": "测试单选",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "测试复选",
+              "label": "测试复选",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "时间格式1",
+              "label": "时间格式1",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "时间格式2",
+              "label": "时间格式2",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "时间格式3",
+              "label": "时间格式3",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "测试签名",
+              "label": "测试签名",
+              "enable": false,
+              "writeable": false
+            },
+            {
+              "source": "测试宏控件",
+              "label": "测试宏控件",
+              "enable": true,
+              "writeable": true
+            },
+            {
+              "source": "ppp",
+              "label": "ppp",
+              "enable": true,
+              "writeable": false
+            }
+          ],
+          "name": "test h5"
+        }
+      ]
+    }
+  ],
+  "success": true,
+  "errMessage": null
+}

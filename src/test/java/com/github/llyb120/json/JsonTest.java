@@ -3,6 +3,7 @@ package com.github.llyb120.json;
 
 //import com.mongodb.MongoClient;
 //import com.mongodb.client.MongoCollection;
+import cn.hutool.core.io.FileUtil;
 import org.bson.Document;
 import org.junit.Test;
 
@@ -53,10 +54,11 @@ public class JsonTest {
 
     @Test
     public void parse() throws IOException {
-        RandomAccessFile raf = new RandomAccessFile("D:\\work\\json\\test\\1.json5", "r");
-        byte[] bs = new byte[(int) raf.length()];
-        raf.read(bs);
-        Obj item = Json.parse(bs);
+        String json = FileUtil.readString("../../test/test.json", "UTF-8");
+//        RandomAccessFile raf = new RandomAccessFile("../../test/1.json5", "r");
+//        byte[] bs = new byte[(int) raf.length()];
+//        raf.read(bs);
+        Obj item = Json.parse(json);
         System.out.println(item);
     }
 
