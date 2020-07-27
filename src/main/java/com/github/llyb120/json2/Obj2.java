@@ -14,6 +14,9 @@ public class Obj2 {
 
     Map<String, Object> map;
 
+    //提前量
+    private String prefix = "";
+
     Obj2(Map map){
         this.map = map;
     }
@@ -89,6 +92,7 @@ public class Obj2 {
      * @return
      */
     public Object get(String path, Object dft){
+        path = handlePrefix(path);
         PathType type = getPathType(path);
         String reg;
         switch (type){
@@ -103,7 +107,7 @@ public class Obj2 {
 
             case SIMPLE_REGEX:
                 //通配符
-                reg = path.replaceAll("\\*", ".+");
+                reg = simpleRegToReg(path);//path.replaceAll("\\*", ".+");
                 for (String s : map.keySet()) {
                     if(s.matches(reg)){
                         return map.get(s);
@@ -129,11 +133,86 @@ public class Obj2 {
     }
 
     public Obj2 set(String path, Object value){
+        path = handlePrefix(path);
         PathType type = getPathType(path);
         if(type != PathType.DIRECT){
             throw new ErrorPathException(path);
         }
         map.put(path, value);
+        return this;
+    }
+
+    String handlePrefix(String path){
+        if("".equals(prefix)){
+            return path;
+        }
+        PathType prefixType = getPathType(prefix);
+        PathType pathType = getPathType(path);
+        if(prefixType == PathType.REGEX ) {
+            if(pathType == PathType.REGEX){
+                return prefix + path.substring(1);
+            } else {
+                //两个都要处理成正则
+                if(pathType == PathType.SIMPLE_REGEX){
+                    return prefix + simpleRegToReg(path);
+                } else {
+                    return prefix + directToReg(path);
+                }
+            }
+        } else if(prefixType == PathType.SIMPLE_REGEX){
+            if(pathType == PathType.REGEX){
+                return "/" + simpleRegToReg(prefix) + path.substring(1);
+            } else {
+                return prefix + path;
+            }
+        } else {
+            if(pathType == PathType.REGEX) {
+                return "/" + directToReg(prefix) + path.substring(1);
+            } else {
+                return prefix + path;
+            }
+        }
+    }
+
+    /**
+     * 修复simplereg的表达式
+     *
+     * @param simpleReg
+     * @return
+     */
+    String simpleRegToReg(String simpleReg){
+        return directToReg(simpleReg)
+            .replaceAll("\\*", "\\\\.");
+    }
+
+    /**
+     * 修复direct的表达式
+     *
+     * @param direct
+     * @return
+     */
+    String directToReg(String direct){
+        return direct
+            .replaceAll("\\*", ".+");
+    }
+
+    /**
+     * 设置提前量，在取值和赋值的时候会加上
+     *
+     * @return
+     */
+    public Obj2 prefix(String prefix){
+        this.prefix = prefix;
+        return this;
+    }
+
+    /**
+     * 无参数，清空prefix
+     *
+     * @return
+     */
+    public Obj2 prefix(){
+        this.prefix = "";
         return this;
     }
 

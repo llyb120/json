@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * @Author: Administrator
+ * @Author: Bin
  * @Date: 2020/7/23 17:44
  */
 public class JSONTest {
@@ -30,11 +30,23 @@ public class JSONTest {
         //通配符取值
         foo = obj.s("*.bar");
         assertEquals(foo, "test2");
+        //prefix
+        foo = obj.s("bar");
+            assertEquals(foo, "");
+            foo = obj.prefix("foo.").s("bar");
+            assertEquals(foo, "test2");
+            foo = obj.prefix("fo*.").s("bar");
+        assertEquals(foo, "test2");
+        foo = obj.prefix("/fo.+").s("bar");
+        assertEquals(foo, "test2");
         try{
             obj.set("*.bar", "test3");
         } catch (Exception e){
             assertNotNull(e);
         }
+        obj.prefix("foo.");
+        obj.set("bar", "test4");
+        obj.prefix();
         for (int i = 0; i < 10; i++) {
             obj.set(String.format("ri.ding.%d.fkfk", i), i);
         }
