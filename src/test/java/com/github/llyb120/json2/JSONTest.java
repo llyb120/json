@@ -1,7 +1,11 @@
 package com.github.llyb120.json2;
 
 import cn.hutool.core.io.FileUtil;
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @Author: Administrator
@@ -12,8 +16,22 @@ public class JSONTest {
     @Test
     public void test(){
         String json = FileUtil.readString("../../test/test.json", "UTF-8");
-        JSON2Parser parser = new JSON2Parser(json);
-        Obj2 obj = parser.parse();
+        Obj2 obj = Json2.parse(json);
+        String foo = obj.s("foo.bar");
+        assertEquals(foo, "");
+        foo = obj.ss("foo.bar", "test");
+        assertEquals(foo, "test");
+        foo = obj.s("foo.bar");
+        assertEquals(foo, "test");
+
+        obj.set("foo.bar", "test2");
+        foo = obj.s("*.bar");
+        assertEquals(foo, "test2");
+        try{
+            obj.set("*.bar", "test3");
+        } catch (Exception e){
+            assertNotNull(e);
+        }
 
         for (int i = 0; i < 10; i++) {
             obj.set(String.format("ri.ding.%d.fkfk", i), i);
