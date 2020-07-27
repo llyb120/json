@@ -1,10 +1,13 @@
 package com.github.llyb120.json2;
 
+import com.github.llyb120.json.Arr;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.llyb120.json.Json.a;
 import static com.github.llyb120.json.Json.cast;
 
 /**
@@ -66,8 +69,8 @@ public class Obj2 {
         return getFixedString(path, dft);
     }
 
-    public String sl(String path) {
-        return "";
+    public List<String> sl(String path) {
+        return getList(path, String.class);
     }
 
     public String getString(String path) {
@@ -91,6 +94,44 @@ public class Obj2 {
         return str;
     }
 
+    public <T> List<T> getList(String path, Class<T> clz){
+        List<T> res = new ArrayList<>();//new ArrayList<>();
+        path = handlePrefix(path);
+        PathType type = getPathType(path);
+        String reg;
+        switch (type) {
+            case DIRECT:
+                //直接取值
+                for (String s : map.keySet()) {
+                    if (s.equalsIgnoreCase(path)) {
+                        res.add(cast(map.get(s), clz));
+                    }
+                }
+                break;
+
+            case SIMPLE_REGEX:
+                //通配符
+                reg = simpleRegToReg(path);//path.replaceAll("\\*", ".+");
+                for (String s : map.keySet()) {
+                    if (s.matches(reg)) {
+                        res.add(cast(map.get(s), clz));
+                    }
+                }
+                break;
+
+            case REGEX:
+                //正则表达式
+                reg = path.substring(1);
+                for (String s : map.keySet()) {
+                    if (s.matches(reg)) {
+                        res.add(cast(map.get(s), clz));
+                    }
+                }
+                break;
+        }
+
+        return res;
+    }
 
     /**
      * 通用取

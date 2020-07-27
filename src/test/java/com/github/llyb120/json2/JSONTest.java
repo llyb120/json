@@ -4,6 +4,8 @@ import cn.hutool.core.io.FileUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -32,10 +34,10 @@ public class JSONTest {
         assertEquals(foo, "test2");
         //prefix
         foo = obj.s("bar");
-            assertEquals(foo, "");
-            foo = obj.enter("foo").s("bar");
-            assertEquals(foo, "test2");
-            foo = obj.clearPath().enter("fo*").s("bar");
+        assertEquals(foo, "");
+        foo = obj.enter("foo").s("bar");
+        assertEquals(foo, "test2");
+        foo = obj.clearPath().enter("fo*").s("bar");
         assertEquals(foo, "test2");
         try{
             obj.set("*.bar", "test3");
@@ -52,6 +54,8 @@ public class JSONTest {
         System.out.println(
             obj.toString()
         );
+        List<String> list = obj.sl("ri.ding.*.fkfk");
+        assertEquals(list.size(), 10);
         int d = 3;
     }
 }
