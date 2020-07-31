@@ -10,6 +10,7 @@ import com.github.llyb120.json.reflect.ClassInfo;
 import com.github.llyb120.json.reflect.ClassType;
 import com.github.llyb120.json.reflect.ReflectUtil;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;
@@ -529,6 +530,8 @@ public final class Json {
                 }
                 return (T) list;
             }
+        } else if(object instanceof Enum) {
+            return (T) ((Enum) object).name();
         }
         if (object.getClass().getName().startsWith("java.")) {
             return (T) object;
@@ -601,8 +604,13 @@ public final class Json {
                 return (T) String.valueOf(source);
             }
         }
-        if (source instanceof String && (targetType == Arr.class || targetType == Obj.class)) {
-            return Json.parse((String) source);
+        if (source instanceof String){
+            if(targetType == Arr.class || targetType == Obj.class){
+                return Json.parse((String) source);
+            }
+            else if(targetType == ObjectId.class){
+                return (T) new ObjectId((String) source);
+            }
         }
         if (targetType == Boolean.class || targetType == boolean.class) {
             if (source instanceof Boolean) {
