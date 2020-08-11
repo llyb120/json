@@ -12,6 +12,7 @@ import com.github.llyb120.json.reflect.ReflectUtil;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import javax.swing.*;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
@@ -670,6 +671,18 @@ public final class Json {
         if (clz == source.getClass()) {
             return (T) source;
         }
+        //枚举
+        Object[] enums = clz.getEnumConstants();
+        if(enums != null && source instanceof CharSequence){
+            for (Object anEnum : enums) {
+                Enum em = (Enum) anEnum;
+                if(em.name().equalsIgnoreCase(((CharSequence) source).toString())){
+                    return (T) em;
+                }
+            }
+            return null;
+        }
+
         //目标为List
         if (List.class.isAssignableFrom(clz)) {
 //            if(Arr.class.isAssignableFrom(clz)){
@@ -827,6 +840,7 @@ public final class Json {
         }
         ClassInfo info = getClassInfo(clz);
         T finalIns = ins;
+
         info.fields.forEach((k, v) -> {
             Type type = v.field.getGenericType();
             setValue(finalIns, v, cast(source.get(v.name), type));
@@ -835,10 +849,13 @@ public final class Json {
         info.setters.forEach((k, v) -> {
             Type type = v.getGenericParameterTypes()[0];
             Object value = cast(source.get(k), type);
+            if (value == null) {
+                return;
+            }
             try {
                 v.invoke(finalIns, value);
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         });
 //        FieldAccess fa = FieldAccess.get(clz);
