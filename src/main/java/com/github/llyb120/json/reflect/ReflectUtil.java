@@ -121,6 +121,14 @@ public class ReflectUtil {
                             info.getters.put(name, method);
                         }
                     }
+                    //对lombok的兼容
+                    //bool的情况，lombok可能会生生is的函数
+                    if(name.startsWith("is") && name.length() > 2 && Util.isLetterUpper(name.charAt(2)) && method.getParameterCount() == 0 && method.getReturnType() == Boolean.TYPE){
+                        name = name.substring(2,3).toLowerCase() + name.substring(3);
+                        if(!info.getters.containsKey(name)){
+                            info.getters.put(name, method);
+                        }
+                    }
                 }
             }
 
