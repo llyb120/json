@@ -1,5 +1,6 @@
 package com.github.llyb120.json;
 
+import org.bson.Document;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ public class ObjTest {
     @Test
     public void ttt(){
         Obj item = o(1,2, new Foo());
+        Document item2 = bo(1, 2, new Foo(), 3, 4);
         int d = 2;
     }
 
