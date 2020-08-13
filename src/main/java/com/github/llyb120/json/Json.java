@@ -61,11 +61,18 @@ public final class Json {
         if (value instanceof Undefined) {
             return 2;
         }
-        //value为生成器
-//        if(value instanceof Generator){
-//        }
-        obj.put(key.toString(), value);
-        return 2;
+        if(key instanceof CharSequence){
+            obj.put(key.toString(), value);
+            return 2;
+        }
+        List<Class> strClz = a(Integer.class, Long.class, Double.class, Float.class);
+        if(strClz.contains(key.getClass())){
+            obj.put(key.toString(), value);
+            return 2;
+        }
+        //被当作实体
+        obj.putAll(ro(key));
+        return 1;
 //        if (objects[i] instanceof Map) {
 //            json.putAll((Map) objects[i]);
 //            i--;

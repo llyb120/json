@@ -60,6 +60,16 @@ public class ObjTest {
 //
 //    }
 
+    @Test
+    public void ttt(){
+        Obj item = o(1,2, new Foo());
+        int d = 2;
+    }
+
+    static class Foo{
+        public String bar = "a";
+    }
+
     public void tt() {
         aaa(
             a(1,2,3)
