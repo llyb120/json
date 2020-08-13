@@ -94,6 +94,10 @@ public class ReflectUtil {
         while(clzz != null && clzz != Object.class){
 
             for (Field field : clzz.getDeclaredFields()) {
+                //忽略该字段
+                if(Modifier.isTransient(field.getModifiers())){
+                    continue;
+                }
                 if (Modifier.isPublic(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())){
                     field.setAccessible(true);
                     String name = field.getName();
@@ -111,6 +115,14 @@ public class ReflectUtil {
                     method.setAccessible(true);
                     if(name.startsWith("set") && name.length() > 3 && Util.isLetterUpper(name.charAt(3)) && method.getParameterCount() == 1 && "void".equals(method.getReturnType().getName())){
                         name = name.substring(3,4).toLowerCase() + name.substring(4);
+                        //如果这个字段是
+                        try {
+                            Field field = clz.getDeclaredField(name);
+                            if(Modifier.isTransient(field.getModifiers())){
+                                continue;
+                            }
+                        } catch (NoSuchFieldException e) {
+                        }
                         if(!info.setters.containsKey(name)){
                             info.setters.put(name, method);
                         }
