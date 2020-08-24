@@ -3,6 +3,7 @@ package com.github.llyb120.json;
 import org.bson.Document;
 import org.junit.Test;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +66,9 @@ public class ObjTest {
     public void ttt(){
         Obj item = o(1,2, new Foo());
         Document item2 = bo(1, 2, new Foo(), 3, 4);
-        int d = 2;
+
+        List<Foo> list = cast(a(o("bar", "zheng")), new TypeReference<List<Foo>>() {});
+        int c = 2;
     }
 
     static class Foo{
