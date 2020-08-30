@@ -6,7 +6,7 @@
 
     <groupId>com.github.llyb120</groupId>
     <artifactId>json</artifactId>
-    <version>1.1.16</version>
+    <version>1.1.17</version>
     <build>
         <plugins>
             <plugin>
@@ -56,14 +56,25 @@
     </dependencies>
 
     <distributionManagement>
-        <repository>
-            <id>rdc-releases</id>
-            <url>https://repo.rdc.aliyun.com/repository/75714-release-VGoHRA/</url>
-        </repository>
         <snapshotRepository>
-            <id>rdc-snapshots</id>
-            <url>https://repo.rdc.aliyun.com/repository/75714-snapshot-t7sMIW/</url>
+            <id>maven-snapshots</id>
+            <name>maven-snapshots-repository</name>
+            <url>http://106.52.185.146:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
+        <repository>
+            <id>maven-releases</id>
+            <name>maven-releases-repository</name>
+            <url>http://106.52.185.146:8081/repository/maven-releases/</url>
+        </repository>
     </distributionManagement>
-
+<!--    <distributionManagement>-->
+<!--        <repository>-->
+<!--            <id>rdc-releases</id>-->
+<!--            <url>https://repo.rdc.aliyun.com/repository/75714-release-VGoHRA/</url>-->
+<!--        </repository>-->
+<!--        <snapshotRepository>-->
+<!--            <id>rdc-snapshots</id>-->
+<!--            <url>https://repo.rdc.aliyun.com/repository/75714-snapshot-t7sMIW/</url>-->
+<!--        </snapshotRepository>-->
+<!--    </distributionManagement>-->
 </project>
