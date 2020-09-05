@@ -10,6 +10,7 @@ import com.github.llyb120.json.reflect.ClassInfo;
 import com.github.llyb120.json.reflect.ClassType;
 import com.github.llyb120.json.reflect.ReflectUtil;
 import org.bson.Document;
+import org.bson.types.Decimal128;
 import org.bson.types.ObjectId;
 
 import javax.swing.*;
@@ -663,6 +664,10 @@ public final class Json {
                     return (T) (Long) 0L;
                 }
             }
+        }
+        //bson的情况
+        if(targetType == BigDecimal.class && type == Decimal128.class){
+            return (T) ((Decimal128) source).bigDecimalValue();
         }
 
         //可以返回自身
