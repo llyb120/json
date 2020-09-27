@@ -356,7 +356,7 @@ public final class Json {
         Arr ret = a();
         for (Obj map1 : map.values()) {
             Object key = map1.get(parentKey);
-            if (key == null) {
+            if (key == null || "".equals(key)) {
                 ret.add(map1);
                 continue;
             }
